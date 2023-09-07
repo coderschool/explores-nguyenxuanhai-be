@@ -53,8 +53,7 @@ taskController.getSingleTask = async (req, res, next) => {
   try {
     const { id } = req.params;
     console.log(req.params);
-    // if (!mongoose.isValidObjectId(id))
-    //   throw new AppError(400, "Bad request", "Invalid ID");
+
     const filter = { _id: id };
     const singleTask = await Task.find(filter).populate("assignedTo", "name");
     if (!singleTask) throw new AppError(400, "Bad request", "Task not found!");
