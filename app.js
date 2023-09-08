@@ -34,7 +34,7 @@ mongoose
   .then(() => console.log(`DB connected ${mongoURI}`))
   .catch((err) => console.log(err));
 
-app.use("/", indexRouter);
+app.use("/api", indexRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

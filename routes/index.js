@@ -22,6 +22,9 @@ router.get("/tasuku/:test", async (req, res, next) => {
   }
 });
 
+const authApi = require("./auth.api");
+router.use("/auth", authApi);
+
 const userRouter = require("./user.api.js");
 router.use("/users", userRouter);
 

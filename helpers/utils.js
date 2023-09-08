@@ -9,6 +9,11 @@ utilsHelper.sendResponse = (res, status, success, data, errors, message) => {
   return res.status(status).json(response);
 };
 
+// catchAsync so no need to write trycatch for each controller
+utilsHelper.catchAsync = (func) => (req, res, next) => {
+  func(req, res, next).catch((err) => next(err));
+};
+
 // create AppError class that inherits methods from Error class
 class AppError extends Error {
   constructor(statusCode, message, errorType) {
@@ -24,4 +29,5 @@ class AppError extends Error {
 }
 
 utilsHelper.AppError = AppError;
+
 module.exports = utilsHelper;

@@ -1,4 +1,8 @@
 const mongoose = require("mongoose");
+
+const jwt = require("jsonwebtoken");
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+
 //Create schema
 const userSchema = mongoose.Schema(
   {
@@ -9,13 +13,36 @@ const userSchema = mongoose.Schema(
       enum: ["manager", "employee"],
       required: true,
     },
-    isDeleted: { type: Boolean, default: false, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true, select: false },
+    isDeleted: { type: Boolean, default: false, required: true, select: false },
     responsibleFor: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Task" }],
   },
   {
     timestamps: true,
   }
 );
+
+// omit password and isDeleted in res
+userSchema.methods.toJSON = function () {
+  const user = this._doc;
+  delete user.password;
+  delete user.isDeleted;
+  return user;
+};
+
+// method to gen accessToken for user for 1 day
+userSchema.methods.generateToken = async function () {
+  const payload = {
+    _id: this._id,
+    role: this.role,
+  };
+
+  const accessToken = jwt.sign(payload, JWT_SECRET_KEY, {
+    expiresIn: "1d",
+  });
+  return accessToken;
+};
 
 userSchema.pre("find", function () {
   this.where({ isDeleted: false });

@@ -1,24 +1,37 @@
 const mongoose = require("mongoose");
-const { AppError, sendResponse } = require("../helpers/utils");
+const { AppError, sendResponse, catchAsync } = require("../helpers/utils");
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 
 const userController = {};
 
-userController.createUser = async (req, res, next) => {
-  try {
-    const nameFound = await User.findOne({ name: req.body.name });
-    if (nameFound)
-      throw new AppError(400, "Bad Request", "User already exists!");
+userController.createUser = catchAsync(async (req, res, next) => {
+  // Get data from request
+  let { name, email, password } = req.body;
 
-    const info = req.body;
-    // if (!info || Object.keys(info).length === 0)
-    //   throw new AppError(400, "Bad request", "Create user error");
-    const created = await User.create(info);
-    sendResponse(res, 200, true, created, null, "Create user success");
-  } catch (error) {
-    next(error);
-  }
-};
+  // Business Logic Validation
+  let user = await User.findOne({ email });
+  if (user) throw new AppError(400, "User already exists", "Create User Error");
+
+  // Process
+  //   crypting password
+  const salt = await bcrypt.genSalt(10);
+  password = await bcrypt.hash(password, salt);
+  user = await User.create({ name, email, password });
+
+  // gen a daypass accessToken for user
+  const accessToken = await user.generateToken();
+
+  // Response
+  sendResponse(
+    res,
+    200,
+    true,
+    { user, accessToken },
+    null,
+    "Create User successful"
+  );
+});
 
 userController.getUsers = async (req, res, next) => {
   try {

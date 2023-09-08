@@ -1,11 +1,15 @@
 const express = require("express");
-const {
-  createUser,
-  getUsers,
-  getSingleUser,
-  deleteUser,
-} = require("../controllers/user.controllers");
-const { userValidator, reqIdValidator } = require("../middleware/validators");
+const { body, param } = require("express-validator");
+// const {
+//   createUser,
+//   getUsers,
+//   getSingleUser,
+//   deleteUser,
+// } = require("../controllers/user.controllers");
+const userController = require("../controllers/user.controllers");
+const validators = require("../middlewares/validators");
+const authentication = require("../middlewares/authentication");
+// const { userValidator, reqIdValidator } = require("../middleware/validators");
 const router = express.Router();
 
 /**
@@ -14,7 +18,18 @@ const router = express.Router();
  * @access private, manager
  * @requiredBody: name
  */
-router.post("/", userValidator, createUser);
+router.post(
+  "/",
+  validators.validate([
+    body("name", "Invalid name").exists().notEmpty(),
+    body("email", "Invalid email")
+      .exists()
+      .isEmail()
+      .normalizeEmail({ gmail_remove_dots: false }),
+    body("password", "Invalid password").exists().notEmpty(),
+  ]),
+  userController.createUser
+);
 
 /**
  * @route GET api/users
@@ -22,20 +37,20 @@ router.post("/", userValidator, createUser);
  * @access private
  * @allowedQueries: name
  */
-router.get("/", getUsers);
+router.get("/", authentication.loginRequired, userController.getUsers);
 
 /**
  * @route GET api/users/:id
  * @description Get user by id
  * @access public
  */
-router.get("/:id", reqIdValidator, getSingleUser);
+router.get("/:id", validators.validate([]), userController.getSingleUser);
 
 /**
  * @route DELETE api/users/:id
  * @description Delete user by id
  * @access private
  */
-router.delete("/:id", reqIdValidator, deleteUser);
+router.delete("/:id", validators.validate([]), userController.deleteUser);
 
 module.exports = router;
