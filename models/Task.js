@@ -10,8 +10,15 @@ const taskSchema = mongoose.Schema(
       enum: ["pending", "working", "review", "done", "archive"],
       //   required: true,
     },
+    priority: {
+      type: String,
+      default: "normal",
+      enum: ["low", "normal", "high"],
+    },
+    dueDate: { type: Date },
     isDeleted: { type: Boolean, default: false, required: true },
     assignedTo: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
+    inProject: { type: mongoose.SchemaTypes.ObjectId, ref: "Project" },
   },
   {
     timestamps: true,

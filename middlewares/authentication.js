@@ -8,7 +8,7 @@ authentication.loginRequired = (req, res, next) => {
   try {
     // authorization in postman
     const tokenString = req.headers.authorization;
-    console.log(tokenString);
+    // console.log(tokenString);
     if (!tokenString)
       throw new AppError(401, "Login required", "Authentication Error");
 
@@ -26,7 +26,19 @@ authentication.loginRequired = (req, res, next) => {
 
       // give userId to req (from token payload) so controller can have userId after loginRequired
       req.userId = payload._id;
+      req.userRole = payload.role;
     });
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+authentication.managerRequired = (req, res, next) => {
+  try {
+    if (req.userRole !== "manager")
+      throw new AppError(401, "Manager access only", "Authentication Error");
+    console.log("Hi manager ", req.userId);
     next();
   } catch (error) {
     next(error);

@@ -37,7 +37,12 @@ router.post(
  * @access private
  * @allowedQueries: name
  */
-router.get("/", authentication.loginRequired, userController.getUsers);
+router.get(
+  "/",
+  authentication.loginRequired,
+  authentication.managerRequired,
+  userController.getUsers
+);
 
 /**
  * @route GET api/users/:id
