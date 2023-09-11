@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
+const { promisify } = require("util");
 const { catchAsync, AppError, sendResponse } = require("../helpers/utils");
 const Invitation = require("../models/Invitation");
 
@@ -7,7 +8,9 @@ const invitationController = {};
 
 invitationController.createInvitation = catchAsync(async (req, res, next) => {
   const { email } = req.body;
-  const inviteToken = crypto.randomBytes(48).toString("base64url");
+  // const inviteToken = crypto.randomBytes(48).toString("base64url");
+  const randomBytesAsync = promisify(crypto.randomBytes);
+  const inviteToken = (await randomBytesAsync(48)).toString("base64url");
 
   let invitation = await Invitation.findOne({ email });
   if (invitation)

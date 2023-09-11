@@ -1,15 +1,9 @@
 const express = require("express");
 const { body, param, query } = require("express-validator");
-// const {
-//   createUser,
-//   getUsers,
-//   getSingleUser,
-//   deleteUser,
-// } = require("../controllers/user.controllers");
 const userController = require("../controllers/user.controllers");
 const validators = require("../middlewares/validators");
 const authentication = require("../middlewares/authentication");
-// const { userValidator, reqIdValidator } = require("../middleware/validators");
+
 const router = express.Router();
 
 /**

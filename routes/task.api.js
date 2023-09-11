@@ -1,20 +1,7 @@
 const express = require("express");
-// const {
-//   createTask,
-//   getTasks,
-//   getSingleTask,
-//   deleteTask,
-//   addReference,
-//   editTask,
-// } = require("../controllers/task.controllers");
 const taskController = require("../controllers/task.controllers");
 const validators = require("../middlewares/validators");
 const { body } = require("express-validator");
-// const {
-//   taskValidator,
-//   taskEditValidator,
-//   reqIdValidator,
-// } = require("../middleware/validators");
 
 const router = express.Router();
 
