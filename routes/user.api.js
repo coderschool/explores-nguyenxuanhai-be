@@ -33,7 +33,7 @@ router.post(
  */
 router.get(
   "/",
-  authentication.loginRequired,
+  authentication.accessRequired,
   authentication.managerRequired,
   userController.getUsers
 );

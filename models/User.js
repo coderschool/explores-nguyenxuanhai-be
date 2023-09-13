@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const jwt = require("jsonwebtoken");
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+const JWT_SECRET_REFRESH_KEY = process.env.JWT_SECRET_REFRESH_KEY;
 
 //Create schema
 const userSchema = mongoose.Schema(
@@ -32,16 +33,22 @@ userSchema.methods.toJSON = function () {
 };
 
 // method to gen accessToken for user for 1 day
-userSchema.methods.generateToken = async function () {
+userSchema.methods.generateAccessToken = async function () {
   const payload = {
     _id: this._id,
     role: this.role,
   };
-
   const accessToken = jwt.sign(payload, JWT_SECRET_KEY, {
-    expiresIn: "1d",
+    expiresIn: "10m",
   });
   return accessToken;
+};
+
+userSchema.methods.generateRefreshToken = async function () {
+  const refreshToken = jwt.sign({ _id: this._id }, JWT_SECRET_REFRESH_KEY, {
+    expiresIn: "1d",
+  });
+  return refreshToken;
 };
 
 userSchema.pre("find", function () {
