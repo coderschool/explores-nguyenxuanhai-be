@@ -61,11 +61,11 @@ authController.refreshAccess = catchAsync(async (req, res, next) => {
     decodedId = decoded._id;
   });
 
-  // send a new access token
+  // gen and send a new access token
   const user = await User.findById(decodedId);
   if (!user)
     throw new AppError("404", "User not found", "Refresh Access Error");
-  console.log(user, "wassup");
+
   const accessToken = await user.generateAccessToken();
 
   sendResponse(
