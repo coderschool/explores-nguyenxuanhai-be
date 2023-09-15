@@ -35,9 +35,11 @@ authController.loginWithEmail = catchAsync(async (req, res, next) => {
 });
 
 authController.refreshAccess = catchAsync(async (req, res, next) => {
-  const refreshToken = req.cookies?.jwt;
-  if (!refreshToken)
-    throw new AppError(401, "Refresh Token required", "Refresh Access Error");
+  //   const refreshToken = req.cookies?.jwt;
+  //   if (!refreshToken)
+  //     throw new AppError(401, "Refresh Token required", "Refresh Access Error");
+
+  const refreshToken = req.cookies.jwt;
 
   let decodedId;
 

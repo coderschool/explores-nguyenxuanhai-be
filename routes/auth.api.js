@@ -1,6 +1,6 @@
 const express = require("express");
 const validators = require("../middlewares/validators");
-const { body } = require("express-validator");
+const { body, cookie } = require("express-validator");
 const authController = require("../controllers/auth.controllers");
 const authentication = require("../middlewares/authentication");
 const router = express.Router();
@@ -31,7 +31,7 @@ router.post(
  */
 router.post(
   "/refresh",
-  // validators.validate([]),
+  validators.validate([cookie("jwt", "Login session expired").exists()]),
   authController.refreshAccess
 );
 
