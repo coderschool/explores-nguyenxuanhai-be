@@ -3,11 +3,12 @@ const crypto = require("crypto");
 const { promisify } = require("util");
 const { catchAsync, AppError, sendResponse } = require("../helpers/utils");
 const Invitation = require("../models/Invitation");
+const User = require("../models/User");
 
 const invitationController = {};
 
 invitationController.createInvitation = catchAsync(async (req, res, next) => {
-  const { email } = req.body;
+  const { email, name } = req.body;
   // const inviteToken = crypto.randomBytes(48).toString("base64url");
   const randomBytesAsync = promisify(crypto.randomBytes);
   const inviteToken = (await randomBytesAsync(48)).toString("base64url");
@@ -22,24 +23,39 @@ invitationController.createInvitation = catchAsync(async (req, res, next) => {
 
   invitation = await Invitation.create({ email, inviteToken });
 
+  // create new unverified user/employee
+  await User.create({ name, email, password: `${email}123abc` });
+
   const link = `${req.protocol}://${req.get(
     "host"
-  )}/users/confirm_email?email=${email}&token=${inviteToken}`;
+  )}/api/invitations/confirm_email?email=${email}&token=${inviteToken}`;
 
-  sendResponse(res, 200, true, { link }, null, "Invite successful");
+  sendResponse(res, 200, true, { link, invitation }, null, "Invite successful");
 });
 
 invitationController.confirmEmail = catchAsync(async (req, res, next) => {
   let { email, token } = req.query;
 
   // check email and token in Invitation
-  // ...
+  let invitation = await Invitation.findOne({ inviteToken: token });
+  if (!invitation)
+    throw new AppError(400, "Invitation not found", "Confirm Email Error");
+
+  const user = await User.findOneAndUpdate(
+    { email },
+    { isVerified: true },
+    { new: true }
+  );
+
+  const tempPass = `${email}123abc`;
+
+  await Invitation.findOneAndDelete({ inviteToken: token });
 
   sendResponse(
     res,
     200,
     true,
-    { email, token },
+    { user, tempPass },
     null,
     "Confirm Invitation Email successful"
   );

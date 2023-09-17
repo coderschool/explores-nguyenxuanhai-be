@@ -17,6 +17,7 @@ router.post(
       .exists()
       .isEmail()
       .normalizeEmail({ gmail_remove_dots: false }),
+    body("name", "Invalid name").exists().isString().notEmpty(),
   ]),
   invitationController.createInvitation
 );

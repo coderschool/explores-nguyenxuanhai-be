@@ -16,6 +16,12 @@ const userSchema = mongoose.Schema(
     },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
+    isVerified: {
+      type: Boolean,
+      default: false,
+      required: true,
+      select: false,
+    },
     isDeleted: { type: Boolean, default: false, required: true, select: false },
     responsibleFor: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Task" }],
   },

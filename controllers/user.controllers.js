@@ -7,7 +7,8 @@ const userController = {};
 
 userController.createUser = catchAsync(async (req, res, next) => {
   // Get data from request
-  let { name, email, password } = req.body;
+  let { name, email, password, role } = req.body;
+  let isVerified = role === "manager" ? true : false;
 
   // Business Logic Validation
   let user = await User.findOne({ email });
@@ -17,10 +18,10 @@ userController.createUser = catchAsync(async (req, res, next) => {
   //   crypting password
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
-  user = await User.create({ name, email, password });
+  user = await User.create({ name, email, password, role, isVerified });
 
-  // gen a daypass accessToken for user
-  const accessToken = await user.generateToken();
+  // gen an accessToken for user
+  const accessToken = await user.generateAccessToken();
 
   // Response
   sendResponse(
