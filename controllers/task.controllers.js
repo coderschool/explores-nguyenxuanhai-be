@@ -33,7 +33,6 @@ const taskController = {};
 
 taskController.createTask = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
-  console.log(currentUserId, "current");
 
   const info = req.body;
   if (!info || Object.keys(info).length === 0)
@@ -42,7 +41,7 @@ taskController.createTask = catchAsync(async (req, res, next) => {
   const assigneeId = req.body.assignedTo;
 
   info.creator = currentUserId;
-  console.log(info, "info");
+
   let task = await Task.create(info);
 
   if (assigneeId) {
@@ -109,63 +108,135 @@ taskController.deleteTask = async (req, res, next) => {
   }
 };
 
-taskController.editTask = async (req, res, next) => {
+// taskController.editTask = async (req, res, next) => {
+//   const targetId = req.params.id;
+//   const assigneeId = req.body.assignedTo;
+//   try {
+//     // if (!mongoose.isValidObjectId(targetId))
+//     //   throw new AppError(400, "Bad request", "Invalid ID");
+//     // if (assigneeId && !mongoose.isValidObjectId(assigneeId))
+//     //   throw new AppError(400, "Bad request", "Invalid user ID");
+
+//     let taskFound = await Task.findById(targetId);
+//     if (!taskFound) throw new AppError(400, "Bad request", "Task not found");
+
+//     if (taskFound.status === "done" && req.body.status !== "archive")
+//       throw new AppError(
+//         400,
+//         "Bad Request",
+//         "Completed tasks can only be archived"
+//       );
+
+//     const prevAssigneeId = taskFound.assignedTo
+//       ? taskFound.assignedTo.toString()
+//       : undefined;
+//     if (assigneeId && prevAssigneeId === assigneeId)
+//       throw new AppError(
+//         400,
+//         "Bad Request",
+//         "Task already assigned to this user"
+//       );
+//     Object.assign(taskFound, { ...req.body });
+
+//     taskFound = await taskFound.save();
+
+//     if (assigneeId) {
+//       // remove task from prev assignee responisbleFor array
+//       if (prevAssigneeId) {
+//         let prevAssignee = await User.findById(prevAssigneeId);
+//         if (!prevAssignee)
+//           throw new AppError(400, "Bad request", "Previous assignee not found");
+//         prevAssignee.responsibleFor = prevAssignee.responsibleFor.filter(
+//           (task) => task.toString() !== taskFound._id.toString()
+//         );
+//         prevAssignee = await prevAssignee.save();
+//       }
+
+//       //   push task to new assignee responsibleFor array
+//       let assignee = await User.findById(assigneeId);
+//       if (!assignee)
+//         throw new AppError(400, "Bad request", "Assignee not found");
+
+//       assignee.responsibleFor.push(taskFound._id);
+//       assignee = await assignee.save();
+//     }
+
+//     sendResponse(res, 200, true, taskFound, null, "Update task success");
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+taskController.editTask = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  const currentUserRole = req.userRole;
+
   const targetId = req.params.id;
   const assigneeId = req.body.assignedTo;
-  try {
-    // if (!mongoose.isValidObjectId(targetId))
-    //   throw new AppError(400, "Bad request", "Invalid ID");
-    // if (assigneeId && !mongoose.isValidObjectId(assigneeId))
-    //   throw new AppError(400, "Bad request", "Invalid user ID");
 
-    let taskFound = await Task.findById(targetId);
-    if (!taskFound) throw new AppError(400, "Bad request", "Task not found");
+  let task = await Task.findById(targetId);
+  if (!task) throw new AppError(400, "Bad request", "Task not found");
 
-    if (taskFound.status === "done" && req.body.status !== "archive")
-      throw new AppError(
-        400,
-        "Bad Request",
-        "Completed tasks can only be archived"
+  if (task.status === "done" && req.body.status !== "archive")
+    throw new AppError(
+      400,
+      "Bad Request",
+      "Completed tasks can only be archived"
+    );
+
+  const prevAssigneeId = task.assignedTo
+    ? task.assignedTo.toString()
+    : undefined;
+  if (assigneeId && prevAssigneeId === assigneeId)
+    throw new AppError(
+      400,
+      "Bad Request",
+      "Task already assigned to this user"
+    );
+
+  // Object.assign(task, { ...req.body });
+  // can only update certain fields
+  const allows =
+    currentUserRole === "manager"
+      ? [
+          "description",
+          "status",
+          "priority",
+          "dueDate",
+          "assignedTo",
+          "inProject",
+        ]
+      : ["status"];
+  allows.forEach((field) => {
+    // update if field isn't empty
+    if (req.body[field] !== undefined) {
+      task[field] = req.body[field];
+    }
+  });
+
+  task = await task.save();
+
+  if (assigneeId) {
+    // remove task from prev assignee responisbleFor array
+    if (prevAssigneeId) {
+      let prevAssignee = await User.findById(prevAssigneeId);
+      if (!prevAssignee)
+        throw new AppError(400, "Bad request", "Previous assignee not found");
+      prevAssignee.responsibleFor = prevAssignee.responsibleFor.filter(
+        (item) => item.toString() !== task._id.toString()
       );
-
-    const prevAssigneeId = taskFound.assignedTo
-      ? taskFound.assignedTo.toString()
-      : undefined;
-    if (assigneeId && prevAssigneeId === assigneeId)
-      throw new AppError(
-        400,
-        "Bad Request",
-        "Task already assigned to this user"
-      );
-    Object.assign(taskFound, { ...req.body });
-
-    taskFound = await taskFound.save();
-
-    if (assigneeId) {
-      // remove task from prev assignee responisbleFor array
-      if (prevAssigneeId) {
-        let prevAssignee = await User.findById(prevAssigneeId);
-        if (!prevAssignee)
-          throw new AppError(400, "Bad request", "Previous assignee not found");
-        prevAssignee.responsibleFor = prevAssignee.responsibleFor.filter(
-          (task) => task.toString() !== taskFound._id.toString()
-        );
-        prevAssignee = await prevAssignee.save();
-      }
-
-      //   push task to new assignee responsibleFor array
-      let assignee = await User.findById(assigneeId);
-      if (!assignee)
-        throw new AppError(400, "Bad request", "Assignee not found");
-
-      assignee.responsibleFor.push(taskFound._id);
-      assignee = await assignee.save();
+      prevAssignee = await prevAssignee.save();
     }
 
-    sendResponse(res, 200, true, taskFound, null, "Update task success");
-  } catch (error) {
-    next(error);
+    //   push task to new assignee responsibleFor array
+    let assignee = await User.findById(assigneeId);
+    if (!assignee) throw new AppError(400, "Bad request", "Assignee not found");
+
+    assignee.responsibleFor.push(task._id);
+    assignee = await assignee.save();
   }
-};
+
+  sendResponse(res, 200, true, task, null, "Update task success");
+});
 
 module.exports = taskController;

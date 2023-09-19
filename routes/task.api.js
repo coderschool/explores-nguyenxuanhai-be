@@ -1,7 +1,7 @@
 const express = require("express");
 const taskController = require("../controllers/task.controllers");
 const validators = require("../middlewares/validators");
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const authentication = require("../middlewares/authentication");
 
 const router = express.Router();
@@ -62,6 +62,14 @@ router.delete("/:id", validators.validate([]), taskController.deleteTask);
  * @description update a task
  * @access private
  */
-router.put("/:id", validators.validate([]), taskController.editTask);
+router.put(
+  "/:id",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    param("id").exists().isString().custom(validators.checkObjectId),
+  ]),
+  taskController.editTask
+);
 
 module.exports = router;
