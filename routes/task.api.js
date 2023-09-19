@@ -2,6 +2,7 @@ const express = require("express");
 const taskController = require("../controllers/task.controllers");
 const validators = require("../middlewares/validators");
 const { body } = require("express-validator");
+const authentication = require("../middlewares/authentication");
 
 const router = express.Router();
 
@@ -13,6 +14,8 @@ const router = express.Router();
  */
 router.post(
   "/",
+  authentication.accessRequired,
+  authentication.managerRequired,
   validators.validate([
     body("name", "Invalid task name").exists().notEmpty().isString(),
     body("description", "Invalid description").exists().notEmpty().isString(),

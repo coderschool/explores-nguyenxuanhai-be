@@ -1,35 +1,63 @@
 const mongoose = require("mongoose");
-const { AppError, sendResponse } = require("../helpers/utils");
+const { AppError, sendResponse, catchAsync } = require("../helpers/utils");
 const Task = require("../models/Task");
 const User = require("../models/User");
 
 const taskController = {};
 
-taskController.createTask = async (req, res, next) => {
-  try {
-    const info = req.body;
-    if (!info || Object.keys(info).length === 0)
-      throw new AppError(400, "Bad request", "Create task error");
-    const assigneeId = req.body.assignedTo;
-    // if (assigneeId && !mongoose.isValidObjectId(assigneeId))
-    //   throw new AppError(400, "Bad request", "Invalid user ID");
+// taskController.createTask = async (req, res, next) => {
+//   try {
+//     const info = req.body;
+//     if (!info || Object.keys(info).length === 0)
+//       throw new AppError(400, "Bad request", "Create task error");
+//     const assigneeId = req.body.assignedTo;
+//     // if (assigneeId && !mongoose.isValidObjectId(assigneeId))
+//     //   throw new AppError(400, "Bad request", "Invalid user ID");
 
-    const created = await Task.create(info);
+//     const created = await Task.create(info);
 
-    if (assigneeId) {
-      let assignee = await User.findById(assigneeId);
-      if (!assignee)
-        throw new AppError(400, "Bad request", "Assignee not found!");
+//     if (assigneeId) {
+//       let assignee = await User.findById(assigneeId);
+//       if (!assignee)
+//         throw new AppError(400, "Bad request", "Assignee not found!");
 
-      assignee.responsibleFor.push(created._id);
-      assignee = await assignee.save();
-    }
+//       assignee.responsibleFor.push(created._id);
+//       assignee = await assignee.save();
+//     }
 
-    sendResponse(res, 200, true, created, null, "Create task success");
-  } catch (error) {
-    next(error);
+//     sendResponse(res, 200, true, created, null, "Create task success");
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+taskController.createTask = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  console.log(currentUserId, "current");
+
+  const info = req.body;
+  if (!info || Object.keys(info).length === 0)
+    throw new AppError(400, "Bad request", "Create task error");
+
+  const assigneeId = req.body.assignedTo;
+
+  info.creator = currentUserId;
+  console.log(info, "info");
+  let task = await Task.create(info);
+
+  if (assigneeId) {
+    let assignee = await User.findById(assigneeId);
+    if (!assignee)
+      throw new AppError(400, "Bad request", "Assignee not found!");
+
+    assignee.responsibleFor.push(task._id);
+    assignee = await assignee.save();
   }
-};
+
+  task = await task.populate("creator");
+
+  sendResponse(res, 200, true, task, null, "Create task success");
+});
 
 taskController.getTasks = async (req, res, next) => {
   try {
