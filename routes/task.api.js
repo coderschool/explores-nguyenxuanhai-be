@@ -9,7 +9,7 @@ const router = express.Router();
 /**
  * @route POST api/tasks
  * @description Create a new task
- * @access private, manager
+ * @access private manager
  * @requiredBody: name
  */
 router.post(

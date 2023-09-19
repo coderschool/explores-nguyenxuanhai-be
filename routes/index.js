@@ -31,6 +31,9 @@ router.use("/users", userRouter);
 const taskRouter = require("./task.api.js");
 router.use("/tasks", taskRouter);
 
+const projectRouter = require("./project.api.js");
+router.use("/projects", projectRouter);
+
 const invitationRouter = require("./invitation.api.js");
 router.use("/invitations", invitationRouter);
 
