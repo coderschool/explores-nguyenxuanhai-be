@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { AppError, sendResponse, catchAsync } = require("../helpers/utils");
 const Task = require("../models/Task");
 const User = require("../models/User");
+const Project = require("../models/Project");
 
 const taskController = {};
 
@@ -39,11 +40,13 @@ taskController.createTask = catchAsync(async (req, res, next) => {
     throw new AppError(400, "Bad request", "Create task error");
 
   const assigneeId = req.body.assignedTo;
+  const projectId = req.body.inProject;
 
-  info.creator = currentUserId;
+  // info.creator = currentUserId;
 
   let task = await Task.create(info);
 
+  //   push task to new assignee responsibleFor array
   if (assigneeId) {
     let assignee = await User.findById(assigneeId);
     if (!assignee)
@@ -53,12 +56,19 @@ taskController.createTask = catchAsync(async (req, res, next) => {
     assignee = await assignee.save();
   }
 
-  task = await task.populate("creator");
+  //   push task to project includeTasks array
+  let project = await Project.findById(projectId);
+  if (!project) throw new AppError(400, "Bad request", "Project not found");
+
+  project.includeTasks.push(task._id);
+  project = await project.save();
+
+  // task = await task.populate("creator");
 
   sendResponse(res, 200, true, task, null, "Create task success");
 });
 
-taskController.getTasks = async (req, res, next) => {
+taskController.getAllTasks = async (req, res, next) => {
   try {
     const name = req.query.name;
     const status = req.query.status;
@@ -204,7 +214,7 @@ taskController.editTask = catchAsync(async (req, res, next) => {
           "priority",
           "dueDate",
           "assignedTo",
-          "inProject",
+          // "inProject",
         ]
       : ["status"];
   allows.forEach((field) => {

@@ -18,9 +18,69 @@ router.post(
   authentication.accessRequired,
   authentication.managerRequired,
   validators.validate([
-    body("name", "Invalid task name").exists().notEmpty().isString(),
+    body("name", "Invalid project name").exists().notEmpty().isString(),
     body("description", "Invalid description").exists().notEmpty().isString(),
   ]),
   projectController.createProject
 );
+
+/**
+ * @route GET api/projects
+ * @description Get a list of all projects
+ * @access private
+ * @allowedQueries: name
+ */
+router.get(
+  "/",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([]),
+  projectController.getAllProjects
+);
+
+/**
+ * @route GET api/projects/:id
+ * @description Get a single project by id
+ * @access private
+ */
+router.get(
+  "/:id",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    param("id").exists().isString().custom(validators.checkObjectId),
+  ]),
+  projectController.getSingleProject
+);
+
+/**
+ * @route DELETE api/projects/:id
+ * @description Delete project by id
+ * @access private
+ */
+router.delete(
+  "/:id",
+  authentication.accessRequired,
+  authentication.managerRequired,
+  validators.validate([
+    param("id").exists().isString().custom(validators.checkObjectId),
+  ]),
+  projectController.deleteProject
+);
+
+/**
+ * @route PUT api/projects/:id
+ * @description update a project
+ * @access private
+ */
+router.put(
+  "/:id",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    param("id").exists().isString().custom(validators.checkObjectId),
+  ]),
+  projectController.editProject
+);
+
 module.exports = router;

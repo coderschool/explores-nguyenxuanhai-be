@@ -23,7 +23,11 @@ const taskSchema = mongoose.Schema(
       ref: "User",
       // required: true,
     },
-    inProject: { type: mongoose.SchemaTypes.ObjectId, ref: "Project" },
+    inProject: {
+      type: mongoose.SchemaTypes.ObjectId,
+      required: true,
+      ref: "Project",
+    },
   },
   {
     timestamps: true,

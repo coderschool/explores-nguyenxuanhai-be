@@ -26,7 +26,7 @@ router.post(
       .optional()
       .isIn([["low", "normal", "high"]]),
     body("inProject", "Invalid project ID")
-      .optional()
+      .exists()
       .custom(validators.checkObjectId),
     body("assignedTo", "Invalid task ID")
       .optional()
@@ -37,25 +37,47 @@ router.post(
 
 /**
  * @route GET api/tasks
- * @description Get a list of tasks
+ * @description Get a list of all tasks
  * @access private
  * @allowedQueries: name
  */
-router.get("/", validators.validate([]), taskController.getTasks);
+router.get(
+  "/",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([]),
+  taskController.getAllTasks
+);
 
 /**
  * @route GET api/tasks/:id
- * @description Get task by id
- * @access public
+ * @description Get a single task by id
+ * @access private
  */
-router.get("/:id", validators.validate([]), taskController.getSingleTask);
+router.get(
+  "/:id",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    param("id").exists().isString().custom(validators.checkObjectId),
+  ]),
+  taskController.getSingleTask
+);
 
 /**
  * @route DELETE api/tasks/:id
  * @description Delete task by id
  * @access private
  */
-router.delete("/:id", validators.validate([]), taskController.deleteTask);
+router.delete(
+  "/:id",
+  authentication.accessRequired,
+  authentication.managerRequired,
+  validators.validate([
+    param("id").exists().isString().custom(validators.checkObjectId),
+  ]),
+  taskController.deleteTask
+);
 
 /**
  * @route PUT api/tasks/:id
