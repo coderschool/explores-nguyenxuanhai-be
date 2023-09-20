@@ -51,6 +51,19 @@ userController.getUsers = async (req, res, next) => {
   }
 };
 
+userController.getCurrentUser = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  const currentUserRole = req.userRole;
+
+  const user = await User.find({ _id: currentUserId }).populate(
+    "responsibleFor"
+  );
+  if (!user)
+    throw new AppError(400, "User not found", "Get Current User Error");
+
+  sendResponse(res, 200, true, user, null, "Get current User success");
+});
+
 userController.getSingleUser = async (req, res, next) => {
   try {
     const { id } = req.params;

@@ -39,6 +39,19 @@ router.get(
 );
 
 /**
+ * @route GET api/users/me
+ * @description Get a list of users
+ * @access private
+ * @allowedQueries: name
+ */
+router.get(
+  "/me",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  userController.getCurrentUser
+);
+
+/**
  * @route GET api/users/:id
  * @description Get user by id
  * @access public
