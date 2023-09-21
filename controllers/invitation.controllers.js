@@ -9,9 +9,9 @@ const invitationController = {};
 
 invitationController.createInvitation = catchAsync(async (req, res, next) => {
   const { email, name } = req.body;
-  // const inviteToken = crypto.randomBytes(48).toString("base64url");
-  const randomBytesAsync = promisify(crypto.randomBytes);
-  const inviteToken = (await randomBytesAsync(48)).toString("base64url");
+  const inviteToken = crypto.randomBytes(48).toString("base64url");
+  // const randomBytesAsync = promisify(crypto.randomBytes);
+  // const inviteToken = (await randomBytesAsync(48)).toString("base64url");
 
   let invitation = await Invitation.findOne({ email });
   if (invitation)
@@ -20,6 +20,10 @@ invitationController.createInvitation = catchAsync(async (req, res, next) => {
       "Invitation already exists",
       "Create Invitation Error"
     );
+
+  const user = await User.findOne({ email });
+  if (user)
+    throw new AppError(400, "User already exists", "Create Invitation Error");
 
   invitation = await Invitation.create({ email, inviteToken });
 

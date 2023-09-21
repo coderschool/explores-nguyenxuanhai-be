@@ -14,6 +14,8 @@ authController.loginWithEmail = catchAsync(async (req, res, next) => {
   // Business Logic Validation
   const user = await User.findOne({ email }, "+password");
   if (!user) throw new AppError("400", "Invalid Credentials", "Login Error");
+  if (!user.isVerified)
+    throw new AppError("400", "Account unverified", "Login Error");
 
   // Process
   // gen accessToken and refreshToken if password is correct
