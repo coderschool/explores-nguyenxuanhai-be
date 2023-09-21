@@ -68,28 +68,76 @@ taskController.createTask = catchAsync(async (req, res, next) => {
   sendResponse(res, 200, true, task, null, "Create task success");
 });
 
-taskController.getAllTasks = async (req, res, next) => {
-  try {
-    const name = req.query.name;
-    const status = req.query.status;
-    const filter = { name, status };
-    if (!name) delete filter.name;
-    if (!status) delete filter.status;
-    const tasks = await Task.find(filter)
-      .sort({ createdAt: -1 })
-      .populate("assignedTo", "name");
-    if (!tasks) throw new AppError(400, "Bad request", "Tasks not found!");
+taskController.getAllTasks = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  const currentUserRole = req.userRole;
 
-    sendResponse(res, 200, true, tasks, null, "Get all tasks success");
-  } catch (error) {
-    next(error);
+  // use rest operator to put the other queries in filter obj
+  let { page, limit, ...filter } = { ...req.query };
+  page = parseInt(page) || 1;
+  limit = parseInt(limit) || 10;
+
+  // set up search queries
+  const filterConditions = [{ isDeleted: false }];
+  // query for assignee
+  if (filter.assignee) {
+    const assignee = await User.findOne({
+      // search for user by name, ignore caps; but better to use getSingleUser
+      name: { $regex: filter.assignee, $options: "i" },
+    });
+    if (!assignee)
+      throw new AppError(400, "Assignee not found", "Get All Tasks Error");
+    const assigneeId = assignee._id;
+    filterConditions.push({
+      assignedTo: { _id: assigneeId },
+    });
   }
-};
+  // query for status and priority
+  if (filter.status) {
+    filterConditions.push({
+      status: filter.status,
+    });
+  }
+  if (filter.priority) {
+    filterConditions.push({
+      priority: filter.priority,
+    });
+  }
+  // limited access for non-managers (can only see unassigned tasks)
+  if (currentUserRole !== "manager") {
+    filterConditions.push({ assignedTo: undefined });
+  }
+  // create filterCriteria based on filterConditions (reusable for other cases)
+  const filterCriteria = filterConditions.length
+    ? { $and: filterConditions }
+    : {};
+
+  // find total tasks number (for pagination)
+  const count = await Task.countDocuments(filterCriteria);
+  const totalPages = Math.ceil(count / limit);
+  const offset = limit * (page - 1); // tasks number before chosen page
+
+  const tasks = await Task.find(filterCriteria)
+    .sort({ createdAt: -1 })
+    .populate("assignedTo", "name")
+    .skip(offset)
+    .limit(limit);
+  if (!tasks) throw new AppError(400, "Task not found", "Get All Tasks Error");
+
+  sendResponse(
+    res,
+    200,
+    true,
+    { tasks, totalPages, count },
+    null,
+    "Get all tasks success"
+  );
+});
 
 taskController.getSingleTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log(req.params);
+    // console.log(req.params);
 
     const filter = { _id: id };
     const singleTask = await Task.find(filter).populate("assignedTo", "name");
@@ -104,8 +152,7 @@ taskController.getSingleTask = async (req, res, next) => {
 taskController.deleteTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // if (!mongoose.isValidObjectId(id))
-    //   throw new AppError(400, "Bad request", "Invalid ID");
+
     const deleted = await Task.findByIdAndUpdate(
       id,
       { isDeleted: true },
@@ -117,65 +164,6 @@ taskController.deleteTask = async (req, res, next) => {
     next(error);
   }
 };
-
-// taskController.editTask = async (req, res, next) => {
-//   const targetId = req.params.id;
-//   const assigneeId = req.body.assignedTo;
-//   try {
-//     // if (!mongoose.isValidObjectId(targetId))
-//     //   throw new AppError(400, "Bad request", "Invalid ID");
-//     // if (assigneeId && !mongoose.isValidObjectId(assigneeId))
-//     //   throw new AppError(400, "Bad request", "Invalid user ID");
-
-//     let taskFound = await Task.findById(targetId);
-//     if (!taskFound) throw new AppError(400, "Bad request", "Task not found");
-
-//     if (taskFound.status === "done" && req.body.status !== "archive")
-//       throw new AppError(
-//         400,
-//         "Bad Request",
-//         "Completed tasks can only be archived"
-//       );
-
-//     const prevAssigneeId = taskFound.assignedTo
-//       ? taskFound.assignedTo.toString()
-//       : undefined;
-//     if (assigneeId && prevAssigneeId === assigneeId)
-//       throw new AppError(
-//         400,
-//         "Bad Request",
-//         "Task already assigned to this user"
-//       );
-//     Object.assign(taskFound, { ...req.body });
-
-//     taskFound = await taskFound.save();
-
-//     if (assigneeId) {
-//       // remove task from prev assignee responisbleFor array
-//       if (prevAssigneeId) {
-//         let prevAssignee = await User.findById(prevAssigneeId);
-//         if (!prevAssignee)
-//           throw new AppError(400, "Bad request", "Previous assignee not found");
-//         prevAssignee.responsibleFor = prevAssignee.responsibleFor.filter(
-//           (task) => task.toString() !== taskFound._id.toString()
-//         );
-//         prevAssignee = await prevAssignee.save();
-//       }
-
-//       //   push task to new assignee responsibleFor array
-//       let assignee = await User.findById(assigneeId);
-//       if (!assignee)
-//         throw new AppError(400, "Bad request", "Assignee not found");
-
-//       assignee.responsibleFor.push(taskFound._id);
-//       assignee = await assignee.save();
-//     }
-
-//     sendResponse(res, 200, true, taskFound, null, "Update task success");
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 taskController.editTask = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
