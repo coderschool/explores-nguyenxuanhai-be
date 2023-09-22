@@ -122,7 +122,7 @@ taskController.getAllTasks = catchAsync(async (req, res, next) => {
     .populate("assignedTo", "name")
     .skip(offset)
     .limit(limit);
-  if (!tasks) throw new AppError(400, "Task not found", "Get All Tasks Error");
+  if (!tasks) throw new AppError(400, "Tasks not found", "Get All Tasks Error");
 
   sendResponse(
     res,

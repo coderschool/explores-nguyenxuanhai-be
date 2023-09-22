@@ -21,10 +21,32 @@ projectController.getAllProjects = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const currentUserRole = req.userRole;
 
-  const filter = { isDeleted: false };
-  let projects = await Project.find(filter).sort({ createdAt: -1 });
+  // use rest operator to put the other queries in filter obj
+  let { page, limit, ...filter } = { ...req.query };
+  page = parseInt(page) || 1;
+  limit = parseInt(limit) || 10;
 
-  sendResponse(res, 200, true, projects, null, "Get all tasks success");
+  // set up search queries
+  const filterConditions = [{ isDeleted: false }];
+
+  // query for project name
+  if (filter.name) {
+    filterConditions.push({
+      name: { $regex: filter.assignee, $options: "i" },
+    });
+  }
+  // create filterCriteria based on filterConditions (reusable for other cases)
+  const filterCriteria = filterConditions.length
+    ? { $and: filterConditions }
+    : {};
+
+  const projects = await Project.find(filterCriteria)
+    .sort({ createdAt: -1 })
+    .populate("includeTasks");
+  if (!projects)
+    throw new AppError(400, "Projects not found", "Get All Tasks Error");
+
+  sendResponse(res, 200, true, projects, null, "Get all projects success");
 });
 
 projectController.getSingleProject = catchAsync(async (req, res, next) => {
