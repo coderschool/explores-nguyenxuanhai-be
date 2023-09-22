@@ -12,7 +12,7 @@ authController.loginWithEmail = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   // Business Logic Validation
-  const user = await User.findOne({ email }, "+password");
+  const user = await User.findOne({ email }, "+password").select("+isVerified");
   if (!user) throw new AppError("400", "Invalid Credentials", "Login Error");
   if (!user.isVerified)
     throw new AppError("400", "Account unverified", "Login Error");

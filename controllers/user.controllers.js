@@ -64,6 +64,40 @@ userController.getCurrentUser = catchAsync(async (req, res, next) => {
   sendResponse(res, 200, true, user, null, "Get current User success");
 });
 
+userController.changePassword = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  const currentUserRole = req.userRole;
+
+  let { currentPassword, newPassword } = req.body;
+
+  let user = await User.findOne({ _id: currentUserId }, "+password").populate(
+    "responsibleFor"
+  );
+  if (!user)
+    throw new AppError("400", "User not found", "Change password Error");
+
+  // check current password
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch)
+    throw new AppError(
+      "400",
+      "Wrong current password",
+      "Change password Error"
+    );
+
+  // encrypt new password
+  const salt = await bcrypt.genSalt(10);
+  newPassword = await bcrypt.hash(newPassword, salt);
+
+  user = await User.findByIdAndUpdate(
+    { _id: currentUserId },
+    { password: newPassword },
+    { new: true }
+  );
+
+  sendResponse(res, 200, true, user, null, "Change password success");
+});
+
 userController.getSingleUser = async (req, res, next) => {
   try {
     const { id } = req.params;

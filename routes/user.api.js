@@ -40,7 +40,7 @@ router.get(
 
 /**
  * @route GET api/users/me
- * @description Get a list of users
+ * @description Get info of current user
  * @access private
  * @allowedQueries: name
  */
@@ -49,6 +49,23 @@ router.get(
   authentication.accessRequired,
   // authentication.managerRequired,
   userController.getCurrentUser
+);
+
+/**
+ * @route POST api/users/me/change_password
+ * @description Change password of current user
+ * @access private
+ * @allowedQueries: name
+ */
+router.post(
+  "/me/change_password",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    body("currentPassword", "Invalid current password").exists().notEmpty(),
+    body("newPassword", "Invalid new password").exists().notEmpty(),
+  ]),
+  userController.changePassword
 );
 
 /**
