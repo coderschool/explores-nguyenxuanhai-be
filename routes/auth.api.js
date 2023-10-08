@@ -35,4 +35,17 @@ router.post(
   authController.refreshAccess
 );
 
+/**
+ * @route DELETE /auth/logout
+ * @description
+ * @body
+ * @access login required
+ */
+router.delete(
+  "/logout",
+  authentication.accessRequired,
+  validators.validate([cookie("jwt", "Login session expired").exists()]),
+  authController.logout
+);
+
 module.exports = router;

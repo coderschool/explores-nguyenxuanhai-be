@@ -82,4 +82,19 @@ authController.refreshAccess = catchAsync(async (req, res, next) => {
   );
 });
 
+authController.logout = async (req, res, next) => {
+  try {
+    // Destroying refresh token in http-only cookie
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
+
+    sendResponse(res, 200, true, {}, null, "Log out success");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = authController;
