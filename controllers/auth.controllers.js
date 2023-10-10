@@ -76,7 +76,7 @@ authController.refreshAccess = catchAsync(async (req, res, next) => {
     res,
     200,
     true,
-    { accessToken },
+    { user, accessToken },
     null,
     "Refresh Access successful"
   );
