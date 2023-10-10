@@ -55,7 +55,7 @@ userController.getCurrentUser = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const currentUserRole = req.userRole;
 
-  const user = await User.find({ _id: currentUserId }).populate(
+  const user = await User.findOne({ _id: currentUserId }).populate(
     "responsibleFor"
   );
   if (!user)
