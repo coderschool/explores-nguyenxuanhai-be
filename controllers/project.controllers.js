@@ -18,6 +18,11 @@ projectController.createProject = catchAsync(async (req, res, next) => {
     includeMembers: [currentUserId],
   });
 
+  // add project to user's memberOf arr
+  let user = await User.findById(currentUserId);
+  user.memberOf.push(project._id);
+  user = await user.save();
+
   sendResponse(res, 200, true, project, null, "Create task success");
 });
 
