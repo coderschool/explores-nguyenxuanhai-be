@@ -56,7 +56,7 @@ userController.getCurrentUser = catchAsync(async (req, res, next) => {
   const currentUserRole = req.userRole;
 
   const user = await User.findOne({ _id: currentUserId }).populate(
-    "responsibleFor"
+    "responsibleFor memberOf"
   );
   if (!user)
     throw new AppError(400, "User not found", "Get Current User Error");
