@@ -76,7 +76,7 @@ router.delete(
 router.put(
   "/:id",
   authentication.accessRequired,
-  // authentication.managerRequired,
+  authentication.managerRequired,
   validators.validate([
     param("id").exists().isString().custom(validators.checkObjectId),
   ]),

@@ -94,7 +94,48 @@ projectController.editProject = catchAsync(async (req, res, next) => {
     }
   });
 
-  project = await project.save();
+  // push added member to includeMembers arr
+  const { addedMemberId } = req.body;
+  if (addedMemberId) {
+    if (!mongoose.isValidObjectId(addedMemberId))
+      throw new AppError(400, "Bad request", "Invalid added member ObjectId");
+
+    let addedMember = await User.findById(addedMemberId);
+    if (!addedMember)
+      throw new AppError(400, "Bad request", "Added member not found");
+
+    if (project.includeMembers.includes(addedMemberId))
+      throw new AppError(400, "Bad request", "Already a member");
+
+    project.includeMembers.push(addedMemberId);
+    project = await project.save();
+
+    // push project to memberOf arr
+    addedMember.memberOf.push(project._id);
+    addedMember = await addedMember.save();
+  }
+
+  // // remove removed member from includeMembers arr
+  const { removedMemberId } = req.body;
+  if (removedMemberId) {
+    if (!mongoose.isValidObjectId(removedMemberId))
+      throw new AppError(400, "Bad request", "Invalid removed member ObjectId");
+
+    let removedMember = await User.findById(removedMemberId);
+    if (!removedMember)
+      throw new AppError(400, "Bad request", "Removed member not found");
+
+    project.includeMembers = project.includeMembers.filter(
+      (item) => item.toString() !== removedMemberId.toString()
+    );
+    project = await project.save();
+
+    // remove project from memberOf arr
+    removedMember.memberOf = removedMember.memberOf.filter(
+      (item) => item.toString() !== project._id.toString()
+    );
+    removedMember = await removedMember.save();
+  }
 
   sendResponse(res, 200, true, project, null, "Update project success");
 });

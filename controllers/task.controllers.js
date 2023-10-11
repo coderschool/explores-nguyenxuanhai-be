@@ -49,8 +49,7 @@ taskController.createTask = catchAsync(async (req, res, next) => {
   //   push task to new assignee responsibleFor array
   if (assigneeId) {
     let assignee = await User.findById(assigneeId);
-    if (!assignee)
-      throw new AppError(400, "Bad request", "Assignee not found!");
+    if (!assignee) throw new AppError(400, "Bad request", "Assignee not found");
 
     assignee.responsibleFor.push(task._id);
     assignee = await assignee.save();

@@ -24,6 +24,7 @@ const userSchema = mongoose.Schema(
     },
     isDeleted: { type: Boolean, default: false, required: true, select: false },
     responsibleFor: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Task" }],
+    memberOf: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Project" }],
   },
   {
     timestamps: true,

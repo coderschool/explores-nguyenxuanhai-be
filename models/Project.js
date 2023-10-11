@@ -6,6 +6,7 @@ const projectSchema = mongoose.Schema(
     description: { type: String, required: true },
     isDeleted: { type: Boolean, default: false, required: true },
     includeTasks: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Task" }],
+    includeMembers: [{ type: mongoose.SchemaTypes.ObjectId, ref: "User" }],
   },
   {
     timestamps: true,
