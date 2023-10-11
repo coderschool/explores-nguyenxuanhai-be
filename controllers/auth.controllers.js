@@ -12,7 +12,9 @@ authController.loginWithEmail = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   // Business Logic Validation
-  const user = await User.findOne({ email }, "+password").select("+isVerified");
+  const user = await User.findOne({ email }, "+password")
+    .select("+isVerified")
+    .populate("memberOf");
   if (!user) throw new AppError("400", "Invalid Credentials", "Login Error");
   if (!user.isVerified)
     throw new AppError("400", "Account unverified", "Login Error");
@@ -66,7 +68,7 @@ authController.refreshAccess = catchAsync(async (req, res, next) => {
   });
 
   // gen and send a new access token
-  const user = await User.findById(decodedId);
+  const user = await User.findById(decodedId).populate("memberOf");
   if (!user)
     throw new AppError("404", "User not found", "Refresh Access Error");
 

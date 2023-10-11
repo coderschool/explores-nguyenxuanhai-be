@@ -12,7 +12,11 @@ projectController.createProject = catchAsync(async (req, res, next) => {
 
   const { name, description } = req.body;
 
-  const project = await Project.create({ name, description });
+  const project = await Project.create({
+    name,
+    description,
+    includeMembers: [currentUserId],
+  });
 
   sendResponse(res, 200, true, project, null, "Create task success");
 });
@@ -93,6 +97,8 @@ projectController.editProject = catchAsync(async (req, res, next) => {
       project[field] = req.body[field];
     }
   });
+
+  project = await project.save();
 
   // push added member to includeMembers arr
   const { addedMemberId } = req.body;
