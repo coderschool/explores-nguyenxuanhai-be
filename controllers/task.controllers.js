@@ -139,7 +139,10 @@ taskController.getSingleTask = async (req, res, next) => {
     // console.log(req.params);
 
     const filter = { _id: id };
-    const singleTask = await Task.find(filter).populate("assignedTo", "name");
+    const singleTask = await Task.findOne(filter).populate(
+      "assignedTo",
+      "name"
+    );
     if (!singleTask) throw new AppError(400, "Bad request", "Task not found!");
 
     sendResponse(res, 200, true, singleTask, null, "Get single task success");
@@ -182,12 +185,12 @@ taskController.editTask = catchAsync(async (req, res, next) => {
       "Edit Task Error"
     );
 
-  if (task.status === "done" && req.body.status !== "archive")
-    throw new AppError(
-      400,
-      "Bad Request",
-      "Completed tasks can only be archived"
-    );
+  // if (task.status === "done" && req.body.status !== "archive")
+  //   throw new AppError(
+  //     400,
+  //     "Bad Request",
+  //     "Completed tasks can only be archived"
+  //   );
 
   const prevAssigneeId = task.assignedTo
     ? task.assignedTo.toString()

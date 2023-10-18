@@ -21,10 +21,10 @@ router.post(
     body("description", "Invalid description").exists().notEmpty().isString(),
     body("status", "Invalid status")
       .optional()
-      .isIn([["pending", "working", "review", "done", "archive"]]),
+      .isIn(["pending", "working", "review", "done", "archive"]),
     body("priority", "Invalid priority")
       .optional()
-      .isIn([["low", "normal", "high"]]),
+      .isIn(["low", "normal", "high"]),
     body("inProject", "Invalid project ID")
       .exists()
       .custom(validators.checkObjectId),
