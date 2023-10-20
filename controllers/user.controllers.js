@@ -104,8 +104,8 @@ userController.getSingleUser = async (req, res, next) => {
     // if (!mongoose.isValidObjectId(id))
     //   throw new AppError(400, "Bad Request", "Invalid ID");
     const filter = { _id: id };
-    const singleUser = await User.find(filter)
-      .sort({ createdAt: -1 })
+    const singleUser = await User.findOne(filter)
+      // .sort({ createdAt: -1 })
       .populate("responsibleFor", "name description status");
     if (!singleUser) throw new AppError(400, "Bad Request", "User not found!");
     sendResponse(res, 200, true, singleUser, null, "Get single user success");
