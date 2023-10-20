@@ -29,7 +29,6 @@ router.post(
  * @route GET api/users
  * @description Get a list of users
  * @access private
- * @allowedQueries: name
  */
 router.get(
   "/",
@@ -39,10 +38,24 @@ router.get(
 );
 
 /**
+ * @route GET api/users
+ * @description Get a list of users
+ * @access private
+ */
+router.get(
+  "/projects/:projectId",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    param("projectId").exists().isString().custom(validators.checkObjectId),
+  ]),
+  userController.getUsersByProject
+);
+
+/**
  * @route GET api/users/me
  * @description Get info of current user
  * @access private
- * @allowedQueries: name
  */
 router.get(
   "/me",

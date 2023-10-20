@@ -58,6 +58,23 @@ projectController.getAllProjects = catchAsync(async (req, res, next) => {
   sendResponse(res, 200, true, projects, null, "Get all projects success");
 });
 
+projectController.getProjectsByUser = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  const currentUserRole = req.userRole;
+
+  let { userId } = req.params;
+
+  const user = await User.findById(userId).populate("memberOf");
+  if (!user)
+    throw new AppError(400, "User not found", "Get Projects by User Error");
+
+  const projects = user.memberOf;
+  if (!projects)
+    throw new AppError(400, "Projects not found", "Get Projects by User Error");
+
+  sendResponse(res, 200, true, projects, null, "Get Projects by User success");
+});
+
 projectController.getSingleProject = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const currentUserRole = req.userRole;

@@ -50,6 +50,22 @@ router.get(
 );
 
 /**
+ * @route GET api/tasks
+ * @description Get a list tasks in a project
+ * @access private
+ * @allowedQueries: name
+ */
+router.get(
+  "/projects/:projectId",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    param("projectId").exists().isString().custom(validators.checkObjectId),
+  ]),
+  taskController.getTasksByProject
+);
+
+/**
  * @route GET api/tasks/:id
  * @description Get a single task by id
  * @access private

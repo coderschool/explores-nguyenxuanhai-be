@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { AppError, sendResponse, catchAsync } = require("../helpers/utils");
 const User = require("../models/User");
+const Project = require("../models/Project");
 const bcrypt = require("bcryptjs");
 
 const userController = {};
@@ -50,6 +51,23 @@ userController.getUsers = async (req, res, next) => {
     next(error);
   }
 };
+
+userController.getUsersByProject = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  const currentUserRole = req.userRole;
+
+  let { projectId } = req.params;
+
+  const project = await Project.findById(projectId).populate("includeMembers");
+  if (!project)
+    throw new AppError(400, "Project not found", "Get users by project Error");
+
+  const users = project.includeMembers;
+  if (!users)
+    throw new AppError(400, "Users not found", "Get users by project Error");
+
+  sendResponse(res, 200, true, users, null, "Get users by project success");
+});
 
 userController.getCurrentUser = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;

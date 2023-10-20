@@ -39,6 +39,22 @@ router.get(
 );
 
 /**
+ * @route GET api/projects/users/:userId
+ * @description Get a list of projects of which a user is a member
+ * @access private
+ * @allowedQueries: name
+ */
+router.get(
+  "/users/:userId",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    param("userId").exists().isString().custom(validators.checkObjectId),
+  ]),
+  projectController.getProjectsByUser
+);
+
+/**
  * @route GET api/projects/:id
  * @description Get a single project by id
  * @access private

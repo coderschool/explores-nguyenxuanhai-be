@@ -133,6 +133,27 @@ taskController.getAllTasks = catchAsync(async (req, res, next) => {
   );
 });
 
+taskController.getTasksByProject = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  const currentUserRole = req.userRole;
+
+  let { projectId } = req.params;
+
+  // const project = await Project.findById(projectId).populate("includeTasks");
+  const project = await Project.findById(projectId).populate({
+    path: "includeTasks",
+    populate: { path: "assignedTo", select: "_id name role" },
+  });
+  if (!project)
+    throw new AppError(400, "Project not found", "Get tasks by project Error");
+
+  const tasks = project.includeTasks;
+  if (!tasks)
+    throw new AppError(400, "Tasks not found", "Get tasks by project Error");
+
+  sendResponse(res, 200, true, tasks, null, "Get tasks by project success");
+});
+
 taskController.getSingleTask = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -223,6 +244,10 @@ taskController.editTask = catchAsync(async (req, res, next) => {
   });
 
   task = await task.save();
+  let editedTask = await Task.findById(taskId).populate(
+    "assignedTo",
+    "name _id role"
+  );
 
   if (assigneeId) {
     // remove task from prev assignee responisbleFor array
@@ -244,7 +269,7 @@ taskController.editTask = catchAsync(async (req, res, next) => {
     assignee = await assignee.save();
   }
 
-  sendResponse(res, 200, true, task, null, "Update task success");
+  sendResponse(res, 200, true, editedTask, null, "Update task success");
 });
 
 module.exports = taskController;
