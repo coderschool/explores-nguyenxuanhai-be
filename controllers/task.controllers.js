@@ -133,23 +133,36 @@ taskController.getAllTasks = catchAsync(async (req, res, next) => {
   );
 });
 
+// taskController.getTasksByProject = catchAsync(async (req, res, next) => {
+//   const currentUserId = req.userId;
+//   const currentUserRole = req.userRole;
+
+//   let { projectId } = req.params;
+
+//   // const project = await Project.findById(projectId).populate("includeTasks");
+//   const project = await Project.findById(projectId).populate({
+//     path: "includeTasks",
+//     populate: { path: "assignedTo", select: "_id name role" },
+//   });
+//   if (!project)
+//     throw new AppError(400, "Project not found", "Get tasks by project Error");
+
+//   const tasks = project.includeTasks;
+//   if (!tasks)
+//     throw new AppError(400, "Tasks not found", "Get tasks by project Error");
+
+//   sendResponse(res, 200, true, tasks, null, "Get tasks by project success");
+// });
 taskController.getTasksByProject = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const currentUserRole = req.userRole;
 
   let { projectId } = req.params;
 
-  // const project = await Project.findById(projectId).populate("includeTasks");
-  const project = await Project.findById(projectId).populate({
-    path: "includeTasks",
-    populate: { path: "assignedTo", select: "_id name role" },
-  });
-  if (!project)
-    throw new AppError(400, "Project not found", "Get tasks by project Error");
-
-  const tasks = project.includeTasks;
-  if (!tasks)
-    throw new AppError(400, "Tasks not found", "Get tasks by project Error");
+  const tasks = await Task.find({ inProject: projectId }).populate(
+    "assignedTo",
+    "_id name role"
+  );
 
   sendResponse(res, 200, true, tasks, null, "Get tasks by project success");
 });
