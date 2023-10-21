@@ -82,7 +82,10 @@ projectController.getSingleProject = catchAsync(async (req, res, next) => {
   const projectId = req.params.id;
 
   const filter = { _id: projectId };
-  const project = await Project.findOne(filter).populate("includeTasks");
+  const project = await Project.findOne(filter)
+    .populate("includeTasks")
+    .populate("includeMembers")
+    .exec();
   if (!project) throw new AppError(400, "Bad request", "Project not found!");
 
   sendResponse(res, 200, true, project, null, "Get single project success");
@@ -165,7 +168,12 @@ projectController.editProject = catchAsync(async (req, res, next) => {
     removedMember = await removedMember.save();
   }
 
-  sendResponse(res, 200, true, project, null, "Update project success");
+  const editedProject = await Project.findById(project._id)
+    .populate("includeTasks")
+    .populate("includeMembers")
+    .exec();
+
+  sendResponse(res, 200, true, editedProject, null, "Update project success");
 });
 
 module.exports = projectController;
