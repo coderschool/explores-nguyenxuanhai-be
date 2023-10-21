@@ -163,6 +163,8 @@ taskController.getTasksByProject = catchAsync(async (req, res, next) => {
     "assignedTo",
     "_id name role"
   );
+  if (!tasks)
+    throw new AppError(400, "Tasks not found", "Get tasks by project Error");
 
   sendResponse(res, 200, true, tasks, null, "Get tasks by project success");
 });
