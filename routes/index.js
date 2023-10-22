@@ -37,4 +37,7 @@ router.use("/projects", projectRouter);
 const invitationRouter = require("./invitation.api.js");
 router.use("/invitations", invitationRouter);
 
+const commentRouter = require("./comment.api.js");
+router.use("/comments", commentRouter);
+
 module.exports = router;
