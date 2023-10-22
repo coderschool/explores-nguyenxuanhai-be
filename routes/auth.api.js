@@ -44,7 +44,7 @@ router.post(
 router.delete(
   "/logout",
   authentication.accessRequired,
-  validators.validate([cookie("jwt", "Login session expired").exists()]),
+  // validators.validate([cookie("jwt", "Login session expired").exists()]),
   authController.logout
 );
 
