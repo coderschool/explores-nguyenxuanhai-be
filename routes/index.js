@@ -40,4 +40,7 @@ router.use("/invitations", invitationRouter);
 const commentRouter = require("./comment.api.js");
 router.use("/comments", commentRouter);
 
+const notificationRouter = require("./notification.api.js");
+router.use("/notifications", notificationRouter);
+
 module.exports = router;

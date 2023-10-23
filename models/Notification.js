@@ -4,7 +4,9 @@ const notificationSchema = mongoose.Schema(
   {
     message: { type: String, required: true },
     isDeleted: { type: Boolean, default: false, required: true },
-    forUsers: [{ type: mongoose.SchemaTypes.ObjectId, ref: "User" }],
+    // forUsers: [{ type: mongoose.SchemaTypes.ObjectId, ref: "User" }],
+    forCreator: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
+    forAssignee: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
   },
   {
     timestamps: true,
