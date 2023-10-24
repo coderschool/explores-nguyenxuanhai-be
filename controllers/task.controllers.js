@@ -3,6 +3,7 @@ const { AppError, sendResponse, catchAsync } = require("../helpers/utils");
 const Task = require("../models/Task");
 const User = require("../models/User");
 const Project = require("../models/Project");
+const Notification = require("../models/Notification");
 
 const taskController = {};
 
@@ -42,7 +43,7 @@ taskController.createTask = catchAsync(async (req, res, next) => {
   const assigneeId = req.body.assignedTo;
   const projectId = req.body.inProject;
 
-  // info.creator = currentUserId;
+  info.createdBy = currentUserId;
 
   let task = await Task.create(info);
 
@@ -213,6 +214,9 @@ taskController.editTask = catchAsync(async (req, res, next) => {
   let task = await Task.findById(taskId);
   if (!task) throw new AppError(400, "Bad request", "Task not found");
 
+  // taskBefore to compare w later
+  const taskBefore = { ...task._doc };
+
   // only manager or assignee can edit
   if (
     currentUserRole !== "manager" &&
@@ -286,6 +290,25 @@ taskController.editTask = catchAsync(async (req, res, next) => {
     assignee.responsibleFor.push(task._id);
     assignee = await assignee.save();
   }
+
+  // create Notification when a field is edited
+  const editFields = ["dueDate", "status", "priority"];
+  // compare certain fields before and after editing
+  const tempArr = editFields
+    .map((field) =>
+      taskBefore[field]?.toString() !== editedTask[field]?.toString()
+        ? `${field} has been set to ${editedTask[field]}.`
+        : ""
+    )
+    .filter((str) => str !== "");
+
+  let notifications = tempArr.map((str) => ({
+    message: `Task updated: ${editedTask.name} - ${str}`,
+    forCreator: editedTask.createdBy,
+    forAssignee: editedTask.assignedTo,
+  }));
+
+  await Notification.create(notifications);
 
   sendResponse(res, 200, true, editedTask, null, "Update task success");
 });
