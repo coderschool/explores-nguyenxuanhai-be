@@ -14,7 +14,9 @@ notificationController.getNotificationsByUser = catchAsync(
 
     let { userId } = req.params;
 
-    const notifications = await Notification.find();
+    const notifications = await Notification.find({
+      $or: [{ forCreator: userId }, { forAssignee: userId }],
+    }).sort({ createdAt: -1 });
 
     if (!notifications)
       throw new AppError(

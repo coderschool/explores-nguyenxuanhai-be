@@ -303,7 +303,7 @@ taskController.editTask = catchAsync(async (req, res, next) => {
     .filter((str) => str !== "");
 
   let notifications = tempArr.map((str) => ({
-    message: `Task updated: ${editedTask.name} - ${str}`,
+    message: `${editedTask.name} - ${str}`,
     forCreator: editedTask.createdBy,
     forAssignee: editedTask.assignedTo,
   }));

@@ -13,11 +13,11 @@ const router = express.Router();
  * @access private
  */
 router.get(
-  "/user/:userId",
+  "/users/:userId",
   authentication.accessRequired,
   // authentication.managerRequired,
   validators.validate([
-    // param("taskId").exists().isString().custom(validators.checkObjectId),
+    param("userId").exists().isString().custom(validators.checkObjectId),
   ]),
   notificationController.getNotificationsByUser
 );
