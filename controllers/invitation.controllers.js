@@ -4,6 +4,8 @@ const { promisify } = require("util");
 const { catchAsync, AppError, sendResponse } = require("../helpers/utils");
 const Invitation = require("../models/Invitation");
 const User = require("../models/User");
+const { sendInvitationLink } = require("../helpers/emails");
+const bcrypt = require("bcryptjs");
 
 const invitationController = {};
 
@@ -28,11 +30,16 @@ invitationController.createInvitation = catchAsync(async (req, res, next) => {
   invitation = await Invitation.create({ email, inviteToken });
 
   // create new unverified user/employee
-  await User.create({ name, email, password: `${email}123abc` });
+  const tempPass = `${email}123abc`;
+  const salt = await bcrypt.genSalt(10);
+  const password = await bcrypt.hash(tempPass, salt);
+  await User.create({ name, email, password });
 
   const link = `${req.protocol}://${req.get(
     "host"
   )}/api/invitations/confirm_email?email=${email}&token=${inviteToken}`;
+
+  await sendInvitationLink(email, link, tempPass);
 
   sendResponse(res, 200, true, { link, invitation }, null, "Invite successful");
 });
@@ -54,6 +61,8 @@ invitationController.confirmEmail = catchAsync(async (req, res, next) => {
   const tempPass = `${email}123abc`;
 
   await Invitation.findOneAndDelete({ inviteToken: token });
+
+  res.redirect(process.env.CLIENT);
 
   sendResponse(
     res,
