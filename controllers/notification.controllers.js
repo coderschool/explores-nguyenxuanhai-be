@@ -63,9 +63,10 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
     };
 
     res.writeHead(200, headers);
-    res.write("event: notifications\n");
-    res.write(`data: ${JSON.stringify(notifications)}\n`);
-    res.write(`id: \n\n`);
+
+    // res.write("event: notifications\n");
+    // res.write(`data: ${JSON.stringify(notifications)}\n`);
+    // res.write(`id: \n\n`);
 
     let interValId = setInterval(async () => {
       let afterArr = await Notification.find({
