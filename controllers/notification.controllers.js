@@ -49,7 +49,7 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
       Connection: "keep-alive",
       "Cache-Control": "no-cache",
     });
-    res.flushHeaders();
+    // res.flushHeaders();
 
     let notifications = await Notification.find({
       forUser: userId,
@@ -82,7 +82,6 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
         notifications = afterArr;
         res.write("event: notifications\n");
         res.write(`data: ${JSON.stringify(notifications)}\n`);
-
         res.write(`id: \n\n`);
       }
     }, 3000);
