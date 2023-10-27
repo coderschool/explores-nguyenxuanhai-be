@@ -22,4 +22,15 @@ router.get(
   notificationController.getNotificationsByUser
 );
 
+router.get(
+  "/subscribe/users/:userId",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([
+    // param("taskId").exists().isString().custom(validators.checkObjectId),
+  ]),
+  // notificationController.getSubscription
+  notificationController.getNotificationsByUserRealTime
+);
+
 module.exports = router;
