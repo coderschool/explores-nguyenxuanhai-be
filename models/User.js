@@ -49,7 +49,7 @@ userSchema.methods.generateAccessToken = async function () {
     role: this.role,
   };
   const accessToken = jwt.sign(payload, JWT_SECRET_KEY, {
-    expiresIn: "10m",
+    expiresIn: "30m",
   });
   return accessToken;
 };
