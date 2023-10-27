@@ -44,13 +44,6 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
 
     let { userId } = req.params;
 
-    res.writeHead(200, {
-      "Content-Type": "text/event-stream",
-      Connection: "keep-alive",
-      "Cache-Control": "no-cache",
-    });
-    // res.flushHeaders();
-
     let notifications = await Notification.find({
       forUser: userId,
       isRead: false,
@@ -63,12 +56,15 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
         "Get Notifications by User Error"
       );
 
-    res.write("event: notifications\n");
-    res.write(`data: ${JSON.stringify(notifications)}\n`);
-    res.write(`id: \n\n`);
+    const headers = {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    };
+
+    res.writeHead(200, headers);
 
     let interValId = setInterval(async () => {
-      // Serverside implementation of event 'current-date'
       let afterArr = await Notification.find({
         isRead: false,
       }).sort({ createdAt: -1 });
@@ -84,11 +80,11 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
         res.write(`data: ${JSON.stringify(notifications)}\n`);
         res.write(`id: \n\n`);
       }
-    }, 3000);
+    }, 5000);
 
     req.on("close", () => {
       console.log("client dropped me");
-
+      clearInterval(interValId);
       res.end("OK");
     });
   }
