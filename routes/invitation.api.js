@@ -2,16 +2,19 @@ const express = require("express");
 const validators = require("../middlewares/validators");
 const invitationController = require("../controllers/invitation.controllers");
 const { body, query } = require("express-validator");
+const authentication = require("../middlewares/authentication");
 
 const router = express.Router();
 
 /**
  * @route POST api/invitations
- * @description
- * @access private
+ * @description create a new invitation
+ * @access private, manager
  */
 router.post(
   "/",
+  authentication.accessRequired,
+  authentication.managerRequired,
   validators.validate([
     body("email", "Invalid email")
       .exists()
@@ -25,7 +28,7 @@ router.post(
 /**
  * @route GET api/invitations/confirm_email
  * @description
- * @access private
+ * @access public
  */
 router.get(
   "/confirm_email",

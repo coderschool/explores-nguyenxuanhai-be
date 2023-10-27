@@ -10,8 +10,7 @@ const router = express.Router();
 /**
  * @route POST api/comments
  * @description Create a new comment
- * @access private manager
- * @requiredBody: name
+ * @access private
  */
 router.post(
   "/",

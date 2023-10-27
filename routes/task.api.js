@@ -53,7 +53,6 @@ router.get(
  * @route GET api/tasks
  * @description Get a list tasks in a project
  * @access private
- * @allowedQueries: name
  */
 router.get(
   "/projects/:projectId",
@@ -97,7 +96,7 @@ router.delete(
 
 /**
  * @route PUT api/tasks/:id
- * @description update a task
+ * @description Update a task
  * @access private
  */
 router.put(

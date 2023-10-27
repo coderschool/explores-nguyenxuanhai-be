@@ -39,7 +39,7 @@ router.get(
 
 /**
  * @route GET api/users
- * @description Get a list of users
+ * @description Get a list of users by project
  * @access private
  */
 router.get(
@@ -68,7 +68,6 @@ router.get(
  * @route POST api/users/me/change_password
  * @description Change password of current user
  * @access private
- * @allowedQueries: name
  */
 router.post(
   "/me/change_password",

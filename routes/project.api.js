@@ -28,7 +28,6 @@ router.post(
  * @route GET api/projects
  * @description Get a list of all projects
  * @access private
- * @allowedQueries: name
  */
 router.get(
   "/",
@@ -42,7 +41,6 @@ router.get(
  * @route GET api/projects/users/:userId
  * @description Get a list of projects of which a user is a member
  * @access private
- * @allowedQueries: name
  */
 router.get(
   "/users/:userId",
@@ -86,7 +84,7 @@ router.delete(
 
 /**
  * @route PUT api/projects/:id
- * @description update a project
+ * @description Update a project
  * @access private
  */
 router.put(

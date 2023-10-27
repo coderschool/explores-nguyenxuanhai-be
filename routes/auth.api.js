@@ -25,7 +25,7 @@ router.post(
 
 /**
  * @route POST /auth/refresh
- * @description
+ * @description refresh credentials
  * @body
  * @access login required
  */
@@ -37,9 +37,9 @@ router.post(
 
 /**
  * @route DELETE /auth/logout
- * @description
+ * @description log out of account
  * @body
- * @access login required
+ * @access Public
  */
 router.delete(
   "/logout",
