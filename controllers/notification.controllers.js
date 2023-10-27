@@ -63,6 +63,10 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
         "Get Notifications by User Error"
       );
 
+    res.write("event: notifications\n");
+    res.write(`data: ${JSON.stringify(notifications)}\n`);
+    res.write(`id: \n\n`);
+
     let interValId = setInterval(async () => {
       // Serverside implementation of event 'current-date'
       let afterArr = await Notification.find({
@@ -82,11 +86,6 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
         res.write(`id: \n\n`);
       }
     }, 3000);
-
-    res.write("event: notifications\n");
-    res.write(`data: ${JSON.stringify(notifications)}\n`);
-
-    res.write(`id: \n\n`);
 
     req.on("close", () => {
       console.log("client dropped me");
