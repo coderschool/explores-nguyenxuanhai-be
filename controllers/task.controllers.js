@@ -297,16 +297,27 @@ taskController.editTask = catchAsync(async (req, res, next) => {
   const tempArr = editFields
     .map((field) =>
       taskBefore[field]?.toString() !== editedTask[field]?.toString()
-        ? `${field} has been set to ${editedTask[field]}.`
+        ? `${field} has been set to "${editedTask[field]}"`
         : ""
     )
     .filter((str) => str !== "");
 
-  let notifications = tempArr.map((str) => ({
+  // noti for task creator
+  let forCreator = tempArr.map((str) => ({
     message: `${editedTask.name} - ${str}`,
-    forCreator: editedTask.createdBy,
-    forAssignee: editedTask.assignedTo,
+    forUser: editedTask.createdBy,
   }));
+
+  // noti for task assignee if they exist
+  let forAssignee = [];
+  if (editedTask.assignedTo) {
+    forAssignee = tempArr.map((str) => ({
+      message: `${editedTask.name} - ${str}`,
+      forUser: editedTask.assignedTo,
+    }));
+  }
+
+  const notifications = [...forCreator, ...forAssignee];
 
   await Notification.create(notifications);
 
