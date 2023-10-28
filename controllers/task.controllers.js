@@ -220,7 +220,8 @@ taskController.editTask = catchAsync(async (req, res, next) => {
   // only manager or assignee can edit
   if (
     currentUserRole !== "manager" &&
-    currentUserId !== task.assignedTo.toString()
+    currentUserId !== task.assignedTo?.toString() &&
+    task.assignedTo !== undefined
   )
     throw new AppError(
       401,
@@ -257,11 +258,20 @@ taskController.editTask = catchAsync(async (req, res, next) => {
           "assignedTo",
           // "inProject",
         ]
-      : ["status"];
+      : ["status", "assignedTo"];
   allows.forEach((field) => {
     // update if field isn't empty
-    if (req.body[field] !== undefined) {
+    if (req.body[field] !== undefined && req.body[field] !== "assignedTo") {
       task[field] = req.body[field];
+    }
+    if (req.body[field] === "assignedTo") {
+      if (currentUserRole === "manager") {
+        task[field] = req.body[field];
+      }
+      // employee can only assign an unassigned task to themself
+      if (currentUserRole === "employee" && req.body[field] === currentUserId) {
+        task[field] = req.body[field];
+      }
     }
   });
 
