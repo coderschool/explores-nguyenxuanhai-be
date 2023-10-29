@@ -314,6 +314,7 @@ taskController.editTask = catchAsync(async (req, res, next) => {
 
   // noti for task creator
   let forCreator = tempArr.map((str) => ({
+    title: "A task created by you has been updated.",
     message: `${editedTask.name} - ${str}`,
     forUser: editedTask.createdBy,
   }));
@@ -322,6 +323,7 @@ taskController.editTask = catchAsync(async (req, res, next) => {
   let forAssignee = [];
   if (editedTask.assignedTo) {
     forAssignee = tempArr.map((str) => ({
+      title: "A task assigned to you has been updated.",
       message: `${editedTask.name} - ${str}`,
       forUser: editedTask.assignedTo,
     }));
