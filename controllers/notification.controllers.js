@@ -97,8 +97,11 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
 
 notificationController.markReadAllNotifications = async (req, res, next) => {
   try {
+    const currentUserId = req.userId;
+    const currentUserRole = req.userRole;
+
     // await Notification.updateMany({}, { $set: { isRead: true } });
-    await Notification.deleteMany({});
+    await Notification.deleteMany({ forUser: currentUserId });
 
     sendResponse(
       res,
