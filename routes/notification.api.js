@@ -33,4 +33,13 @@ router.get(
   notificationController.getNotificationsByUserRealTime
 );
 
+router.delete(
+  "/me",
+  authentication.accessRequired,
+  // authentication.managerRequired,
+  validators.validate([]),
+
+  notificationController.markReadAllNotifications
+);
+
 module.exports = router;

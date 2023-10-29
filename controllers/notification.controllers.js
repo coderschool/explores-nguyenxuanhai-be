@@ -95,4 +95,22 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
   }
 );
 
+notificationController.markReadAllNotifications = async (req, res, next) => {
+  try {
+    // await Notification.updateMany({}, { $set: { isRead: true } });
+    await Notification.deleteMany({});
+
+    sendResponse(
+      res,
+      200,
+      true,
+      {},
+      null,
+      "Mark all notifications as read success"
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = notificationController;
