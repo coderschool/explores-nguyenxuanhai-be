@@ -15,7 +15,6 @@ const router = express.Router();
 router.post(
   "/",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
     body("content", "Invalid comment content").exists().notEmpty().isString(),
     body("aboutTask", "Invalid task ID")
@@ -33,7 +32,6 @@ router.post(
 router.get(
   "/tasks/:taskId",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
     param("taskId").exists().isString().custom(validators.checkObjectId),
   ]),

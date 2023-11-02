@@ -119,8 +119,7 @@ userController.changePassword = catchAsync(async (req, res, next) => {
 userController.getSingleUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // if (!mongoose.isValidObjectId(id))
-    //   throw new AppError(400, "Bad Request", "Invalid ID");
+
     const filter = { _id: id };
     const singleUser = await User.findOne(filter)
       // .sort({ createdAt: -1 })
@@ -135,8 +134,7 @@ userController.getSingleUser = async (req, res, next) => {
 userController.deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // if (!mongoose.isValidObjectId(id))
-    //   throw new AppError(400, "Bad Request", "Invalid ID");
+
     const deleted = await User.findByIdAndUpdate(
       id,
       { isDeleted: true },

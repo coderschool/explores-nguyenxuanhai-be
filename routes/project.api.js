@@ -32,7 +32,6 @@ router.post(
 router.get(
   "/",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([]),
   projectController.getAllProjects
 );
@@ -45,7 +44,6 @@ router.get(
 router.get(
   "/users/:userId",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
     param("userId").exists().isString().custom(validators.checkObjectId),
   ]),
@@ -60,7 +58,6 @@ router.get(
 router.get(
   "/:id",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
     param("id").exists().isString().custom(validators.checkObjectId),
   ]),

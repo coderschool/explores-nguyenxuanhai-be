@@ -64,10 +64,6 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
 
     res.writeHead(200, headers);
 
-    // res.write("event: notifications\n");
-    // res.write(`data: ${JSON.stringify(notifications)}\n`);
-    // res.write(`id: \n\n`);
-
     let interValId = setInterval(async () => {
       let afterArr = await Notification.find({
         forUser: userId,
@@ -100,7 +96,6 @@ notificationController.markReadAllNotifications = async (req, res, next) => {
     const currentUserId = req.userId;
     const currentUserRole = req.userRole;
 
-    // await Notification.updateMany({}, { $set: { isRead: true } });
     await Notification.deleteMany({ forUser: currentUserId });
 
     sendResponse(

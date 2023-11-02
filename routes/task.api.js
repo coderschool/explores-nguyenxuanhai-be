@@ -44,7 +44,6 @@ router.post(
 router.get(
   "/",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([]),
   taskController.getAllTasks
 );
@@ -57,7 +56,6 @@ router.get(
 router.get(
   "/projects/:projectId",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
     param("projectId").exists().isString().custom(validators.checkObjectId),
   ]),
@@ -72,7 +70,6 @@ router.get(
 router.get(
   "/:id",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
     param("id").exists().isString().custom(validators.checkObjectId),
   ]),
@@ -102,7 +99,6 @@ router.delete(
 router.put(
   "/:id",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
     param("id").exists().isString().custom(validators.checkObjectId),
   ]),

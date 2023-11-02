@@ -15,7 +15,6 @@ const router = express.Router();
 router.get(
   "/users/:userId",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
     param("userId").exists().isString().custom(validators.checkObjectId),
   ]),
@@ -25,20 +24,16 @@ router.get(
 router.get(
   "/subscribe/users/:userId",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([
-    // param("taskId").exists().isString().custom(validators.checkObjectId),
+    param("userId").exists().isString().custom(validators.checkObjectId),
   ]),
-  // notificationController.getSubscription
   notificationController.getNotificationsByUserRealTime
 );
 
 router.delete(
   "/me",
   authentication.accessRequired,
-  // authentication.managerRequired,
   validators.validate([]),
-
   notificationController.markReadAllNotifications
 );
 

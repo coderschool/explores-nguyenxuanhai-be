@@ -7,32 +7,6 @@ const Notification = require("../models/Notification");
 
 const taskController = {};
 
-// taskController.createTask = async (req, res, next) => {
-//   try {
-//     const info = req.body;
-//     if (!info || Object.keys(info).length === 0)
-//       throw new AppError(400, "Bad request", "Create task error");
-//     const assigneeId = req.body.assignedTo;
-//     // if (assigneeId && !mongoose.isValidObjectId(assigneeId))
-//     //   throw new AppError(400, "Bad request", "Invalid user ID");
-
-//     const created = await Task.create(info);
-
-//     if (assigneeId) {
-//       let assignee = await User.findById(assigneeId);
-//       if (!assignee)
-//         throw new AppError(400, "Bad request", "Assignee not found!");
-
-//       assignee.responsibleFor.push(created._id);
-//       assignee = await assignee.save();
-//     }
-
-//     sendResponse(res, 200, true, created, null, "Create task success");
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 taskController.createTask = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
 
@@ -62,8 +36,6 @@ taskController.createTask = catchAsync(async (req, res, next) => {
 
   project.includeTasks.push(task._id);
   project = await project.save();
-
-  // task = await task.populate("creator");
 
   sendResponse(res, 200, true, task, null, "Create task success");
 });
@@ -134,26 +106,6 @@ taskController.getAllTasks = catchAsync(async (req, res, next) => {
   );
 });
 
-// taskController.getTasksByProject = catchAsync(async (req, res, next) => {
-//   const currentUserId = req.userId;
-//   const currentUserRole = req.userRole;
-
-//   let { projectId } = req.params;
-
-//   // const project = await Project.findById(projectId).populate("includeTasks");
-//   const project = await Project.findById(projectId).populate({
-//     path: "includeTasks",
-//     populate: { path: "assignedTo", select: "_id name role" },
-//   });
-//   if (!project)
-//     throw new AppError(400, "Project not found", "Get tasks by project Error");
-
-//   const tasks = project.includeTasks;
-//   if (!tasks)
-//     throw new AppError(400, "Tasks not found", "Get tasks by project Error");
-
-//   sendResponse(res, 200, true, tasks, null, "Get tasks by project success");
-// });
 taskController.getTasksByProject = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const currentUserRole = req.userRole;
@@ -173,7 +125,6 @@ taskController.getTasksByProject = catchAsync(async (req, res, next) => {
 taskController.getSingleTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // console.log(req.params);
 
     const filter = { _id: id };
     const singleTask = await Task.findOne(filter).populate(
@@ -229,13 +180,6 @@ taskController.editTask = catchAsync(async (req, res, next) => {
       "Edit Task Error"
     );
 
-  // if (task.status === "done" && req.body.status !== "archive")
-  //   throw new AppError(
-  //     400,
-  //     "Bad Request",
-  //     "Completed tasks can only be archived"
-  //   );
-
   const prevAssigneeId = task.assignedTo
     ? task.assignedTo.toString()
     : undefined;
@@ -246,7 +190,6 @@ taskController.editTask = catchAsync(async (req, res, next) => {
       "Task already assigned to this user"
     );
 
-  // Object.assign(task, { ...req.body });
   // can only update certain fields
   const allows =
     currentUserRole === "manager"
