@@ -3,13 +3,15 @@ const { AppError, sendResponse, catchAsync } = require("../helpers/utils");
 const User = require("../models/User");
 const Project = require("../models/Project");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const { sendUserConfirmationLink } = require("../helpers/emails");
 
 const userController = {};
 
 userController.createUser = catchAsync(async (req, res, next) => {
   // Get data from request
   let { name, email, password, role } = req.body;
-  let isVerified = role === "manager" ? true : false;
+  // let isVerified = role === "manager" ? true : false;
 
   // Business Logic Validation
   let user = await User.findOne({ email });
@@ -19,19 +21,50 @@ userController.createUser = catchAsync(async (req, res, next) => {
   //   crypting password
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
-  user = await User.create({ name, email, password, role, isVerified });
+  // user = await User.create({ name, email, password, role, isVerified });
+  const confirmToken = crypto.randomBytes(48).toString("base64url");
+  user = await User.create({ name, email, password, role, confirmToken });
 
   // gen an accessToken for user
-  const accessToken = await user.generateAccessToken();
+  // const accessToken = await user.generateAccessToken();
+
+  const link = `${req.protocol}://${req.get(
+    "host"
+  )}/api/users/confirm_email?email=${email}&token=${confirmToken}`;
+  await sendUserConfirmationLink(email, link);
 
   // Response
   sendResponse(
     res,
     200,
     true,
-    { user, accessToken },
+    // { user, accessToken },
+    { user },
     null,
     "Create User successful"
+  );
+});
+
+userController.confirmUserEmail = catchAsync(async (req, res, next) => {
+  let { email, token } = req.query;
+
+  // check email and token then update
+  let user = await User.findOneAndUpdate(
+    { email, confirmToken: token },
+    { isVerified: true, confirmToken: undefined },
+    { new: true }
+  );
+  if (!user) throw new AppError(400, "User not found", "Confirm Email Error");
+
+  res.redirect(process.env.CLIENT);
+
+  sendResponse(
+    res,
+    200,
+    true,
+    { user },
+    null,
+    "Confirm Invitation Email successful"
   );
 });
 

@@ -26,6 +26,20 @@ router.post(
 );
 
 /**
+ * @route GET api/users/confirm_email
+ * @description
+ * @access public
+ */
+router.get(
+  "/confirm_email",
+  validators.validate([
+    query("email", "Invalid email").exists().isEmail(),
+    query("token", "Invalid Invitation Token").exists().isString(),
+  ]),
+  userController.confirmUserEmail
+);
+
+/**
  * @route GET api/users
  * @description Get a list of users
  * @access private

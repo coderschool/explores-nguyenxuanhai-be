@@ -12,6 +12,7 @@ const transporter = createTransport({
     pass: env.SMTP_PASSWORD,
   },
 });
+
 emailsHelper.sendInvitationLink = async function (
   toEmail,
   verificationCode,
@@ -21,7 +22,19 @@ emailsHelper.sendInvitationLink = async function (
     from: env.EMAIL,
     to: toEmail,
     subject: "Confirm your email with Tasuku",
-    html: `<p>Welcome to Takusu! Click on this <a href="${verificationCode}">LINK</a> to log in the app. <br>Your temporary password is "${tempPass}". <br>After logging in, please immediately change your password. <br>Thank you!</p>`,
+    html: `<p>Welcome to Tasuku! Click on this <a href="${verificationCode}">LINK</a> to log in the app. <br>Your temporary password is "${tempPass}". <br>After logging in, please immediately change your password. <br>Thank you!</p>`,
+  });
+};
+
+emailsHelper.sendUserConfirmationLink = async function (
+  toEmail,
+  verificationCode
+) {
+  await transporter.sendMail({
+    from: env.EMAIL,
+    to: toEmail,
+    subject: "Confirm your email with Tasuku",
+    html: `<p>Welcome to Tasuku! Click on this <a href="${verificationCode}">LINK</a> to verify your email. <br>Thank you!</p>`,
   });
 };
 

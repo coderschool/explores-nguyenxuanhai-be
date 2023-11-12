@@ -22,6 +22,7 @@ const userSchema = mongoose.Schema(
       required: true,
       select: false,
     },
+    confirmToken: { type: String, required: false, unique: true },
     isDeleted: { type: Boolean, default: false, required: true, select: false },
     responsibleFor: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Task" }],
     memberOf: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Project" }],
