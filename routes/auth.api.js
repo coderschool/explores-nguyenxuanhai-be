@@ -3,6 +3,8 @@ const validators = require("../middlewares/validators");
 const { body, cookie } = require("express-validator");
 const authController = require("../controllers/auth.controllers");
 const authentication = require("../middlewares/authentication");
+const passport = require("../middlewares/passport");
+
 const router = express.Router();
 
 /**
@@ -45,6 +47,23 @@ router.delete(
   "/logout",
 
   authController.logout
+);
+
+router.get(
+  "/login/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
+);
+
+router.get(
+  "/login/google/callback",
+  passport.authenticate("google", {
+    // failureRedirect: "/",
+    session: false,
+  }),
+
+  authController.loginWithGoogleCallback
 );
 
 module.exports = router;

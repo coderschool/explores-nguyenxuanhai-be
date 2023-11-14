@@ -14,8 +14,10 @@ const userSchema = mongoose.Schema(
       enum: ["manager", "employee"],
       required: true,
     },
+    googleId: { type: String, required: false, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true, select: false },
+    // password: { type: String, required: true, select: false },
+    password: { type: String, select: false },
     isVerified: {
       type: Boolean,
       default: false,

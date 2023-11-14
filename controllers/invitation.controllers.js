@@ -60,7 +60,7 @@ invitationController.confirmEmail = catchAsync(async (req, res, next) => {
 
   await Invitation.findOneAndDelete({ inviteToken: token });
 
-  res.redirect(process.env.CLIENT);
+  res.redirect(`${process.env.CLIENT_URL}/login`);
 
   sendResponse(
     res,

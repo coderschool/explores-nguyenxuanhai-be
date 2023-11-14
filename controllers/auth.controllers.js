@@ -97,4 +97,21 @@ authController.logout = async (req, res, next) => {
   }
 };
 
+authController.loginWithGoogleCallback = catchAsync(async (req, res, next) => {
+  const user = req.user;
+
+  const refreshToken = await user.generateRefreshToken();
+
+  // Assigning refresh token in http-only cookie
+  res.cookie("jwt", refreshToken, {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  // Successful authentication, redirect to homepage
+  res.redirect(process.env.CLIENT_URL);
+});
+
 module.exports = authController;

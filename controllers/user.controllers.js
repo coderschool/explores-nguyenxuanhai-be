@@ -56,7 +56,7 @@ userController.confirmUserEmail = catchAsync(async (req, res, next) => {
   );
   if (!user) throw new AppError(400, "User not found", "Confirm Email Error");
 
-  res.redirect(process.env.CLIENT);
+  res.redirect(`${process.env.CLIENT_URL}/login`);
 
   sendResponse(
     res,
