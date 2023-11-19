@@ -80,22 +80,19 @@ authController.refreshAccess = catchAsync(async (req, res, next) => {
   );
 });
 
-authController.logout = async (req, res, next) => {
-  try {
-    if (req.cookies.jwt) {
-      // Destroying refresh token in http-only cookie
-      res.clearCookie("jwt", {
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
-      });
-    }
-
-    sendResponse(res, 200, true, {}, null, "Log out success");
-  } catch (error) {
-    next(error);
+authController.logout = catchAsync(async (req, res, next) => {
+  const currentUserId = req.userId;
+  if (req.cookies.jwt) {
+    // Destroying refresh token in http-only cookie
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
   }
-};
+
+  sendResponse(res, 200, true, {}, null, "Log out success");
+});
 
 authController.loginWithGoogleCallback = catchAsync(async (req, res, next) => {
   const user = req.user;

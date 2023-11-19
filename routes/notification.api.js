@@ -31,7 +31,8 @@ router.get(
 );
 
 router.delete(
-  "/me",
+  // "/me",
+  "/users/:userId",
   authentication.accessRequired,
   validators.validate([]),
   notificationController.markReadAllNotifications

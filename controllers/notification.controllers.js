@@ -16,7 +16,7 @@ notificationController.getNotificationsByUser = catchAsync(
 
     const notifications = await Notification.find({
       forUser: userId,
-      isRead: false,
+      // isRead: false,
     }).sort({ createdAt: -1 });
 
     if (!notifications)
@@ -46,7 +46,7 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
 
     let notifications = await Notification.find({
       forUser: userId,
-      isRead: false,
+      // isRead: false,
     }).sort({ createdAt: -1 });
 
     if (!notifications)
@@ -67,7 +67,7 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
     let interValId = setInterval(async () => {
       let afterArr = await Notification.find({
         forUser: userId,
-        isRead: false,
+        // isRead: false,
       }).sort({ createdAt: -1 });
 
       let isUpdated = Boolean(
@@ -91,10 +91,10 @@ notificationController.getNotificationsByUserRealTime = catchAsync(
   }
 );
 
-notificationController.markReadAllNotifications = async (req, res, next) => {
-  try {
+notificationController.markReadAllNotifications = catchAsync(
+  async (req, res, next) => {
     const currentUserId = req.userId;
-    const currentUserRole = req.userRole;
+    // const currentUserRole = req.userRole;
 
     await Notification.deleteMany({ forUser: currentUserId });
 
@@ -102,13 +102,11 @@ notificationController.markReadAllNotifications = async (req, res, next) => {
       res,
       200,
       true,
-      {},
+      [],
       null,
       "Mark all notifications as read success"
     );
-  } catch (error) {
-    next(error);
   }
-};
+);
 
 module.exports = notificationController;

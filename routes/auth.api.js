@@ -45,7 +45,8 @@ router.post(
  */
 router.delete(
   "/logout",
-
+  authentication.accessRequired,
+  validators.validate([]),
   authController.logout
 );
 
