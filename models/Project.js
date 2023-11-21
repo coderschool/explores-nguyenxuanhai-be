@@ -7,6 +7,13 @@ const projectSchema = mongoose.Schema(
     isDeleted: { type: Boolean, default: false, required: true },
     includeTasks: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Task" }],
     includeMembers: [{ type: mongoose.SchemaTypes.ObjectId, ref: "User" }],
+    startAt: { type: Date, required: true, default: Date.now() },
+
+    endAt: {
+      type: Date,
+      required: true,
+      default: Date.now() + 1000 * 60 * 60 * 24,
+    },
   },
   {
     timestamps: true,

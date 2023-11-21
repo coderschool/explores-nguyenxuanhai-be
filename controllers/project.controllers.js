@@ -10,12 +10,14 @@ projectController.createProject = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const currentUserRole = req.userRole;
 
-  const { name, description } = req.body;
+  const { name, description, startAt, endAt } = req.body;
 
   const project = await Project.create({
     name,
     description,
     includeMembers: [currentUserId],
+    startAt,
+    endAt,
   });
 
   // add project to user's memberOf arr
@@ -115,7 +117,7 @@ projectController.editProject = catchAsync(async (req, res, next) => {
   if (!project) throw new AppError(400, "Bad request", "Project not found");
 
   // can only update certain fields
-  const allows = ["description"];
+  const allows = ["description", "startAt", "endAt"];
   allows.forEach((field) => {
     // update if field isn't empty
     if (req.body[field] !== undefined) {
