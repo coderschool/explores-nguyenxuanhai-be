@@ -21,7 +21,7 @@ router.post(
     body("description", "Invalid description").exists().notEmpty().isString(),
     body("status", "Invalid status")
       .optional()
-      .isIn(["pending", "working", "review", "done", "archive"]),
+      .isIn(["pending", "working", "review", "done", "archived"]),
     body("priority", "Invalid priority")
       .optional()
       .isIn(["low", "normal", "high"]),

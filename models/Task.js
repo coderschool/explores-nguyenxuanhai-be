@@ -7,7 +7,7 @@ const taskSchema = mongoose.Schema(
     status: {
       type: String,
       default: "pending",
-      enum: ["pending", "working", "review", "done", "archive"],
+      enum: ["pending", "working", "review", "done", "archived"],
       //   required: true,
     },
     priority: {

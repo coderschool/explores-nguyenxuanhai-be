@@ -26,7 +26,7 @@ const taskInputSchema = {
     // skip validation if no status in body
     optional: true,
     isIn: {
-      options: [["pending", "working", "review", "done", "archive"]],
+      options: [["pending", "working", "review", "done", "archived"]],
       errorMessage: "Invalid status",
     },
   },
