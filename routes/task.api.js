@@ -101,6 +101,7 @@ router.put(
   authentication.accessRequired,
   validators.validate([
     param("id").exists().isString().custom(validators.checkObjectId),
+    body("effort", "Invalid effort hours").optional().isNumeric(),
   ]),
   taskController.editTask
 );

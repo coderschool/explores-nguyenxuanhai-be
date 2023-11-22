@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { addHours } = require("date-fns");
 
 const projectSchema = mongoose.Schema(
   {
@@ -7,12 +8,12 @@ const projectSchema = mongoose.Schema(
     isDeleted: { type: Boolean, default: false, required: true },
     includeTasks: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Task" }],
     includeMembers: [{ type: mongoose.SchemaTypes.ObjectId, ref: "User" }],
-    startAt: { type: Date, required: true, default: Date.now() },
+    startAt: { type: Date, required: true, default: new Date() },
 
     endAt: {
       type: Date,
       required: true,
-      default: Date.now() + 1000 * 60 * 60 * 24,
+      default: addHours(new Date(), 24),
     },
   },
   {

@@ -200,14 +200,19 @@ taskController.editTask = catchAsync(async (req, res, next) => {
           "dueDate",
           "assignedTo",
           // "inProject",
+          "effort",
         ]
-      : ["status", "assignedTo"];
+      : ["status", "assignedTo", "effort"];
   allows.forEach((field) => {
     // update if field isn't empty
-    if (req.body[field] !== undefined && req.body[field] !== "assignedTo") {
+    if (field !== "assignedTo" && req.body[field] !== undefined) {
+      if (field === "status" && req.body[field] === "done") {
+        task.dateCompleted = new Date();
+      }
       task[field] = req.body[field];
     }
-    if (req.body[field] === "assignedTo") {
+    // update assignee if field isn't empty
+    if (field === "assignedTo" && req.body[field] !== undefined) {
       if (currentUserRole === "manager") {
         task[field] = req.body[field];
       }

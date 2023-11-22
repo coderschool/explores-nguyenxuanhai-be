@@ -28,6 +28,12 @@ const taskSchema = mongoose.Schema(
       required: true,
       ref: "Project",
     },
+    effort: {
+      type: Number,
+    },
+    dateCompleted: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
