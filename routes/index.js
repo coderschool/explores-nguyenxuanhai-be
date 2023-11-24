@@ -43,4 +43,7 @@ router.use("/comments", commentRouter);
 const notificationRouter = require("./notification.api.js");
 router.use("/notifications", notificationRouter);
 
+const resetRouter = require("./reset.api.js");
+router.use("/resets", resetRouter);
+
 module.exports = router;

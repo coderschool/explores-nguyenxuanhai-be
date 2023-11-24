@@ -38,4 +38,13 @@ emailsHelper.sendUserConfirmationLink = async function (
   });
 };
 
+emailsHelper.sendResetLink = async function (toEmail, resetLink) {
+  await transporter.sendMail({
+    from: env.EMAIL,
+    to: toEmail,
+    subject: "Reset password for Tasuku account",
+    html: `<p>Welcome back to Tasuku! Click on this <a href="${resetLink}">LINK</a> to go to reset password page. <br>Thank you!</p>`,
+  });
+};
+
 module.exports = emailsHelper;

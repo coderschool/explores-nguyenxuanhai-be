@@ -15,11 +15,13 @@ invitationController.createInvitation = catchAsync(async (req, res, next) => {
 
   let invitation = await Invitation.findOne({ email });
   if (invitation)
-    throw new AppError(
-      400,
-      "Invitation already exists",
-      "Create Invitation Error"
-    );
+    // throw new AppError(
+    //   400,
+    //   "Invitation already exists",
+    //   "Create Invitation Error"
+    // );
+    // delete old invitation if exists
+    await Invitation.findOneAndDelete({ email });
 
   const user = await User.findOne({ email });
   if (user)
