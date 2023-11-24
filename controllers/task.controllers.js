@@ -171,8 +171,8 @@ taskController.editTask = catchAsync(async (req, res, next) => {
   // only manager or assignee can edit
   if (
     currentUserRole !== "manager" &&
-    currentUserId !== task.assignedTo?.toString() &&
-    task.assignedTo !== undefined
+    currentUserId !== task.assignedTo?.toString()
+    // && task.assignedTo !== undefined
   )
     throw new AppError(
       401,
